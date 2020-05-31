@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper">
+
+<resultMap type="map" id="mapList">
+	<result column="mem_seq" property="memSeq" />
+	<result column="mem_id" property="memId"/>
+	<result column="mem_pwd" property="memPwd"/>
+	<result column="mem_name" property="memName"/>
+	<result column="mem_level" property="memLevel"/>
+	<result column="mem_regdate" property="memRegdate"/>
+	<result column="mem_writer_check" property="memWriterCheck"/>
+</resultMap>
+
+<resultMap type="map" id="boardList">
+	<result column="board_seq" property="boardSeq" />
+	<result column="board_writer" property="boardWriter"/>
+	<result column="board_subject" property="boardSubject"/>
+	<result column="board_regdate" property="boardRegdate"/>
+	<result column="board_uptdate" property="boardUpdate"/>
+	<result column="board_passer" property="boardPasser"/>
+	<result column="board_state" property="boardState"/>
+	<result column="board_content" property="boardContent"/>
+</resultMap>
+
+<resultMap type="map" id="logList">
+	<result column="log_seq" property="logSeq" />
+	<result column="log_uptdate" property="logUpdate"/>
+	<result column="log_passer" property="logPasser"/>
+	<result column="log_state" property="logState"/>
+	<result column="log_writer" property="logWriter"/>
+</resultMap>
+
+<select id="loginInfo" parameterType="map" resultMap="mapList">
+	select 
+			 mem_seq
+	        ,mem_id
+	        ,mem_pwd
+	        ,mem_name
+	        ,mem_level
+	        ,mem_regdate
+	        ,mem_writer_check
+	from cp_member
+	where mem_id = #{id}
+</select>
+
+<select id="searchList" parameterType="map" resultMap="boardList">
+	select
+				board_seq
+		       ,board_writer 
+		       ,board_subject
+		       ,board_regdate
+		       ,board_uptdate
+		       ,board_passer
+		       ,decode(board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
+	from (select 
+						  board_seq
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer
+		                  ,board_subject
+		                  ,board_regdate
+		                  ,board_uptdate
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer
+		                  ,board_state
+          			 from cp_board b)
+	where 1=1
+	<if test="op1 == 'writer'">
+    and board_writer in (select mem_name from cp_member where mem_name = #{keyword})
+    </if>
+    <if test="op1 == 'subject'">
+	and board_subject like '%' || #{keyword} || '%'
+	</if>
+	<if test="op1 == 'passer'">
+    and board_passer in (select mem_name from cp_member where mem_name = #{keyword})
+    </if>
+	<if test="date1 != null and date2 != ''">
+    and to_char(board_regdate, 'yyyy-mm-dd') between #{date1} and #{date2}
+    </if>
+	<if test="level == 'staff' or level == 'amanager'"> <!-- 사원 대리 -->
+	and board_writer = (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})
+	</if>
+ 	<if test="level == 'manager'"> <!-- 과장 -->
+    and NOT(board_state = 'imsi' and board_writer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})) 
+	and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_board where board_seq in (select board_seq from cp_log where log_passer = #{id})))
+	and NOT(board_state = 'paing' and board_passer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_passer and a.mem_id = #{id}))
+    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_board where board_seq in (select board_seq from cp_log where log_passer = #{id})))
+	</if>
+	<if test="level == 'gmanager'"> <!-- 부장 -->
+    and NOT(board_state = 'imsi'
+			and board_writer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}))
+    and NOT(board_state = 'paywait')
+    and NOT(board_passer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
+	</if>
+	order by board_seq desc
+</select>
+
+<select id="writeList" parameterType="map" resultMap="boardList">
+	select
+				rnum
+			   ,board_seq
+		       ,board_writer 
+		       ,board_subject
+		       ,board_regdate
+		       ,board_uptdate
+		       ,board_passer
+		       ,decode(board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
+	from (select 
+						   rownum rnum
+						  ,board_seq
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer
+		                  ,board_subject
+		                  ,board_regdate
+		                  ,board_uptdate
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer
+		                  ,board_state
+          			 from cp_board b)
+	where 1=1
+	<if test="level == 'staff' or level == 'amanager'"> <!-- 사원 대리 -->
+	and board_writer = (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})
+	</if>
+ 	<if test="level == 'manager'"> <!-- 과장 -->
+    and NOT(board_state = 'imsi' and board_writer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})) 
+	and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_board where board_seq in (select board_seq from cp_log where log_passer = #{id})))
+	and NOT(board_state = 'paing' and board_passer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_passer and a.mem_id = #{id}))
+    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_board where board_seq in (select board_seq from cp_log where log_passer = #{id})))
+	</if>
+	<if test="level == 'gmanager'"> <!-- 부장 -->
+    and NOT(board_state = 'imsi'
+			and board_writer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}))
+    and NOT(board_state = 'paywait')
+    and NOT(board_passer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
+	</if>
+	order by board_seq desc
+</select>
+
+<select id="ajaxList" parameterType="map" resultMap="boardList">
+    select
+				board_seq
+		       ,board_writer 
+		       ,board_subject
+		       ,board_regdate
+		       ,board_uptdate
+		       ,board_passer
+		       ,decode(board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
+	from (select 
+						  board_seq
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer
+		                  ,board_subject
+		                  ,board_regdate
+		                  ,board_uptdate
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer
+		                  ,board_state
+          			 from cp_board b)
+	where 1=1
+		<if test="op1 == 'writer'">
+	    and board_writer in (select mem_name from cp_member where mem_name = #{keyword})
+	    </if>
+	    <if test="op1 == 'subject'">
+		and board_subject like '%' || #{keyword} || '%'
+		</if>
+		<if test="op1 == 'passer'">
+	    and board_passer in (select mem_name from cp_member where mem_name = #{keyword})
+	    </if>
+		<if test="date1 != null and date2 != ''">
+	    and to_char(board_regdate, 'yyyy-mm-dd') between #{date1} and #{date2}
+	    </if>
+		<if test="level == 'staff' or level == 'amanager'"> <!-- 사원 대리 -->
+		and board_writer = (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})
+		</if>
+	 	<if test="level == 'manager'"> <!-- 과장 -->
+	    and NOT(board_state = 'imsi' and board_writer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})) 
+		and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_board where board_seq in (select board_seq from cp_log where log_passer = #{id})))
+		and NOT(board_state = 'paing' and board_passer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_passer and a.mem_id = #{id}))
+	    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_board where board_seq in (select board_seq from cp_log where log_passer = #{id})))
+		</if>
+		<if test="level == 'gmanager'"> <!-- 부장 -->
+	    and NOT(board_state = 'imsi'
+				and board_writer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}))
+	    and NOT(board_state = 'paywait')
+	    and NOT(board_passer != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
+		</if>
+	    and board_state = #{op2}
+		order by board_seq desc
+</select>
+
+<insert id="enroll" parameterType="map">
+	insert into cp_board  (
+						   board_seq
+						  ,board_writer
+						  ,board_subject
+						  ,board_regdate
+						  ,board_uptdate
+						  ,board_passer
+						  ,board_state
+						  ,board_content
+						  )
+				   values (
+				    	   board_seq.nextval
+				    	   ,#{name}
+				    	   ,#{subject}
+				    	   ,sysdate
+				    	   <if test="level == 'staff' or level == 'amanager'">
+				    	   ,null
+				    	   </if>
+				    	   <if test="level == 'manager'"> <!-- 과장결재일 -->
+				    	   ,sysdate
+				    	   </if>
+				    	   <if test="level == 'gmanager'"> <!-- 부장결재일 -->
+				    	   ,sysdate
+				    	   </if>
+						   <if test="level == 'staff' or level == 'amanager'">
+				    	   ,null
+				    	   </if>
+				    	   <if test="level == 'manager'"> <!-- 과장결재자 -->
+				    	   ,#{name}
+				    	   </if>
+				    	   <if test="level == 'gmanager'"> <!-- 부장결재자 -->
+				    	   ,#{name}
+				    	   </if>
+				    	   <if test="level == 'staff' or level == 'amanager'">
+				    	   ,'paywait'
+				    	   </if>
+				    	   <if test="level == 'manager'"> <!-- 과장이 결재 했을때 결재중 -->
+				    	   ,'paing'
+				    	   </if>
+				    	   <if test="level == 'gmanager'"> <!-- 부장이 결재 했을때 결재완료 -->
+				    	   ,'paid'
+				    	   </if>
+				    	   ,#{content}
+				    	   )
+</insert>
+
+<insert id="imsiEnroll" parameterType="map">
+	insert into cp_board  (
+						   board_seq
+						  ,board_writer
+						  ,board_subject
+						  ,board_regdate
+						  ,board_uptdate
+						  ,board_passer
+						  ,board_state
+						  ,board_content
+						  )
+				   values (
+						    board_seq.nextval
+						   ,#{name}
+						   ,#{subject}
+						   ,sysdate
+						   ,null
+						   ,null
+						   ,'imsi'
+						   ,#{content}
+						  )
+</insert>
+
+<select id="writeInfo" parameterType="Integer" resultType="map" resultMap="boardList">
+	select
+				board_seq
+		       ,board_writer 
+		       ,board_subject
+		       ,board_content
+		       ,board_uptdate
+		       ,board_passer
+		       ,decode(board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
+	from (select 
+						  board_seq
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer
+		                  ,board_subject
+		                  ,board_content
+		                  ,board_uptdate
+		                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer
+		                  ,board_state
+          			 from cp_board b)
+	where board_seq = #{seq}
+</select>
+
+<update id="button" parameterType="map">
+	update cp_board
+	set  board_subject = #{subject}
+		,board_state = #{state}
+		,board_content = #{content}
+		,board_uptdate = null
+		,board_passer = null
+	where board_seq = #{boardSeq}
+</update>
+
+<update id="payButton" parameterType="map">
+	update cp_board
+	set  board_subject = #{subject}
+		<choose>
+			<when test="memLevel == 'staff' or memLevel == 'amanager'">
+			,board_uptdate = null
+			,board_passer = null
+			</when>
+			<otherwise>
+			,board_uptdate = sysdate
+			,board_passer = #{memId}
+			</otherwise>
+		</choose>
+		,board_state = #{state}
+		,board_content = #{content}
+	where board_seq = #{boardSeq}
+</update>
+
+<insert id="logInsert" parameterType="map">
+	insert into cp_log (
+						 log_seq
+						,log_uptdate
+						,log_passer
+						,log_state
+						,log_writer
+						,board_seq
+						)
+				values (
+						 (select nvl(max(log_seq),0)+1 from cp_log where board_seq = #{boardSeq})
+						 ,sysdate
+						 ,#{boardWriter}
+						 ,#{boardState}
+						 ,#{boardWriter}
+						 ,#{boardSeq}
+						 )
+</insert>
+
+<insert id="logInsert2" parameterType="map">
+	insert into cp_log (
+						 log_seq
+						,log_uptdate
+						,log_passer
+						,log_state
+						,log_writer
+						,board_seq
+						)
+				values (
+						 (select nvl(max(log_seq),0)+1 from cp_log where board_seq = #{boardSeq})
+						 ,sysdate
+						 ,#{memId}
+						 ,#{state}
+						 ,#{boardWriter}
+						 ,#{boardSeq}
+						 )
+</insert>
+
+<select id="clickTrInfo" parameterType="map" resultMap="boardList">
+	select 
+			board_seq
+	       ,board_writer
+	       ,board_subject
+	       ,board_regdate
+	       ,board_uptdate
+	       ,board_passer
+	       ,board_state
+	       ,board_content
+	from cp_board
+	where board_seq = #{boardSeq}
+</select>
+
+<select id="paypageList" resultMap="logList">
+	select a.log_seq
+        ,a.log_uptdate
+        ,log_passer
+        ,decode(log_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') log_state
+	from (select a.log_seq, a.log_uptdate, b.mem_name log_passer, a.log_state, a.board_seq from cp_log a, cp_member b where a.log_passer = b.mem_id) a, cp_board b
+	where a.board_seq = b.board_seq
+	    and b.board_seq = #{seq}
+	    order by log_seq desc
+</select>
+
+<update id="banButton" parameterType="map">
+	update cp_board
+	set board_uptdate = sysdate
+	    ,board_passer = #{boardPasser}
+	    ,board_state = #{boardState}
+	where board_seq = #{boardSeq}
+</update>
+
+<select id="seqCount" resultType="integer">
+	select count(board_seq)
+	from cp_board
+</select>
+
+<select id="wInfo" resultType="string">
+	select board_writer
+	from cp_board
+	where board_seq = #{boardSeq}
+</select>
+
+<select id="count" resultType="integer">
+	select count(board_seq)+1
+	from cp_board
+</select>
+
+</mapper>
