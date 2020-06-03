@@ -60,7 +60,20 @@ function popup(){
 	<table>
 		<tr>
 			<td>
-				${sessionloginInfo.memName}님 환영합니다<input type="button" onclick="location.href='logOut'" value="로그아웃" />
+				<c:if test="${flag != 1}">
+				${sessionloginInfo.memName}(${dLevel})님 환영합니다 - ${sMem.MEM_NAME}(${sMem.MEM_LEVEL})님 환영합니다
+				<input type="button" onclick="location.href='loginPage'" value="로그아웃" /><br>
+				(대리결재일 : ${sMem.DP_DATE})
+				</c:if>
+				
+				<c:if test="${flag == 1}">
+				${sessionloginInfo.memName}(${dLevel})님 환영합니다
+				<input type="button" onclick="location.href='loginPage'" value="로그아웃" /><br>
+				</c:if>
+			</td>
+		</tr>
+		<tr>
+			<td>
 				<input type="hidden" name="seq" value="${sessionloginInfo.memSeq}" />
 				<input type="hidden" name="level" value="${sessionloginInfo.memLevel}" />
 			</td>

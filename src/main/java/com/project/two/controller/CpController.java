@@ -1,5 +1,6 @@
 package com.project.two.controller;
 
+import java.time.chrono.IsoEra;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +9,13 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.border.EmptyBorder;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.project.two.service.CpService;
 
@@ -22,19 +25,13 @@ public class CpController {
 	@Resource(name = "Service")
 	private CpService cpService;
 	
-	//로그인 페이지
+	//로그인 페이지&로그아웃&세션 삭제
 	@RequestMapping("loginPage")
-	public String loginPage() {
+	public String loginPage(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		session.removeAttribute("sessionloginInfo");		
 		return "cp/login";
 	}//loginPage
-	
-	//로그아웃 & 세션 삭제
-	@RequestMapping("logOut")
-	public String logOut(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		session.removeAttribute("sessionloginInfo");
-		return "cp/login";
-	}
 	
 	//로그인 후 리스트
 	//아이디&비밀번호 조회
@@ -46,8 +43,19 @@ public class CpController {
 						, HttpSession session) {
 	
 		Map<String, Object> loginInfo = new HashMap<String, Object>();
+		
 		loginInfo = cpService.login(map); // 로그인 정보를 담음
-
+		
+		if(loginInfo.containsKey("memDrPay") == false) { // 대리결재 권한이 없는경우
+			loginInfo.put("memDrPay", null);
+//			loginInfo.put("payDate", ""); // 권한받은 날짜
+		}
+		else { // 권한이 있는경우 권한받은 날짜를 세션에 넣음 
+			Map<String, Object> smemInfo = cpService.payDate(map);
+			session.setAttribute("smemInfo", smemInfo);
+			System.out.println(smemInfo);
+		}
+		
 		if(loginInfo == null) { // 입력한 아이디가 없을때
 			model.addAttribute("idCheck", 1);
 			return "cp/login";
@@ -79,26 +87,38 @@ public class CpController {
 	
 	//게시판 글목록 조회
 	@RequestMapping("list")
-	public String list(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
-		if (map.isEmpty()) {
-			map.put("curPage", 1);
-			map.put("listSize", 10);
-		}
-		
+	public String list(Model model, HttpSession session) {
 		if(session.getAttribute("sessionloginInfo") == null) {
-			return "cp/login";
+			return "redirect:loginPage";
 		}
 		
 		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		map.put("id", sessionMap.get("memId").toString());
 		map.put("seq", sessionMap.get("memSeq").toString());
 		map.put("level", sessionMap.get("memLevel").toString());
+		map.put("memDrPay", sessionMap.get("memDrPay").toString());
+		
+		String dLevel = cpService.dLevel(map);
+		model.addAttribute("dLevel", dLevel);
+		
+		Map<String, Object> smemInfo = (Map<String, Object>)session.getAttribute("smemInfo");
+		System.out.println(smemInfo);
+		map.put("smemLevel", smemInfo.get("MEMLEVEL").toString());
+		map.put("payDate", smemInfo.get("DP_DATE").toString());
 		
 		List<Map<String, Object>> writeList = new ArrayList<Map<String, Object>>();
 		writeList = cpService.writeList(map); // 로그인시 글목록을 불러옴
 		model.addAttribute("writeList", writeList);
 		System.out.println(map);
+		
+		Map<String, Object> sMem = cpService.drSmem(map);
+		model.addAttribute("sMem", sMem);
+		
+		if(sMem == null) {
+			model.addAttribute("flag", 1);
+		}
 		
 		return "cp/detail";
 	}//list
@@ -106,10 +126,6 @@ public class CpController {
 	//검색
 	@RequestMapping("search")
 	public String search(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
-		if (map.isEmpty()) {
-			map.put("curPage", 1);
-			map.put("listSize", 10);
-		}
 		
 		List<Map<String, Object>> searchList = new ArrayList<Map<String, Object>>();
 		
@@ -310,15 +326,47 @@ public class CpController {
 	}
 	
 	@RequestMapping("dr")
-	public String dr() {
+	public String dr(Model model, HttpSession session) {
+		
+		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
+		String memName = sessionMap.get("memName").toString();
+		String memLevel = sessionMap.get("memLevel").toString();
+		
+		String kLevel = cpService.kLevel(memLevel);
+		
+		model.addAttribute("memName", memName);
+		model.addAttribute("memLevel", kLevel);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("memLevel",memLevel);
+		
+		List<Map<String, Object>> memList = cpService.memList(map);
+		model.addAttribute("memList", memList);
+		
 		return "cp/dr";
 	}
 	
 	@RequestMapping("drr")
-	public String dr(@RequestParam String select) {
-//		String memLevel = cpService.drPay(select);
-//		model.addAttribute("memLevel", memLevel);
-		return "cp/dr";
+	public String dr(@RequestParam String select, HttpSession session) {
+
+		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("smem", sessionMap.get("memId").toString());
+		map.put("gmem", select);
+		int insertDP = cpService.insertDP(map);
+		System.out.println(insertDP);
+		
+		int updateDP = cpService.updateDP(map);
+		System.out.println(updateDP);
+		
+		return "redirect:dr";
+	}
+	
+	@RequestMapping(value="drrr", produces = "application/text; charset=utf8") // ajax 한글깨진거 변환
+	@ResponseBody // ajax 단일값 보낼때
+	public String drrr(@RequestParam Map<String, Object> map) {
+		String kLevel2 = cpService.kLevel2(map);
+		return kLevel2;
 	}
 	
 }

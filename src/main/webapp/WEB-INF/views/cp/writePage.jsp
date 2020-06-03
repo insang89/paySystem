@@ -42,7 +42,7 @@ $(function(){
 	
 	<table>
 		<tr>
-			<td>번호: <input type="text" readonly="readonly" value="${count}" /></td>
+			<td>번호: <input type="text" readonly="readonly" name="boardSeq" value="${count}" /></td>
 		</tr>
 		<tr>
 			<td>작성자: <input type="text" readonly="readonly" value="${sessionloginInfo.memName}" /></td>

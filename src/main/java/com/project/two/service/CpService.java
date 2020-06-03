@@ -40,5 +40,21 @@ public interface CpService {
 	int banButton(Map<String, Object> map);
 
 	List<Map<String, Object>> list2();
+
+	String kLevel(String memLevel);
+
+	List<Map<String, Object>> memList(Map<String, Object> map);
+
+	String kLevel2(Map<String, Object> map);
+
+	int insertDP(Map<String, Object> map);
+
+	String dLevel(Map<String, Object> map);
+
+	Map<String, Object> drSmem(Map<String, Object> map);
+
+	int updateDP(Map<String, Object> map);
+
+	Map<String, Object> payDate(Map<String, Object> map);
 	
 }

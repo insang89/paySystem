@@ -122,5 +122,53 @@ public class CpDaoImpl implements CpDao{
 		// TODO Auto-generated method stub
 		return sqlSession.selectList("mapper.writeList");
 	}
+
+	@Override
+	public String kLevel(String memLevel) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.kLevel", memLevel);
+	}
+
+	@Override
+	public List<Map<String, Object>> memList(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectList("mapper.memList", map);
+	}
+
+	@Override
+	public String kLevel2(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.kLevel2", map);
+	}
+
+	@Override
+	public int insertDP(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.insert("mapper.insertDP", map);
+	}
+
+	@Override
+	public String dLevel(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.dLevel", map);
+	}
+
+	@Override
+	public Map<String, Object> drSmem(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.drSmem", map);
+	}
+
+	@Override
+	public int updateDP(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("mapper.updateDP", map);
+	}
+
+	@Override
+	public Map<String, Object> payDate(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.payDate", map);
+	}
 	
 }

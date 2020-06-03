@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,26 +13,27 @@
 function cl(){
 	window.close();
 }
-
+ 
 	$(function(){
-		$("#select").change(function(){
-			change(this);
-		});
 		
 		$("#pass").click(function(){
 			$("#frm").attr("method", "post").attr("action","drr").submit();
 		});
 		
-		function change(o){
-			var val = $(":selected",o).val();
-			$("#dr").val(val);
-			if(val == '김사원' || val == '이사원' || val == '박사원'){
-				$("#memLevel").val("사원");
-			}
-			if(val == '김대리' || val == '이대리'){
-				$("#memLevel").val("대리");
-			}
-		}
+		$("#select").change(function(){
+			$.ajax({
+					type : "get",
+					url : "drrr",
+					data : $("#frm").serialize(),
+					success : function(data) {
+										$("#memLevel").val(data);
+							},
+					error : function(){
+										alert("error");
+							}
+			});
+		});
+		
 	});
 </script>
 <meta charset="UTF-8">
@@ -43,14 +45,23 @@ function cl(){
 		<tr>
 			<td>대리결재자:</td>
 			<td>
-				<select name="select" id="select">
-					<option value="select">선택하세요</option>
-					<option value="김사원">staff111 김사원</option>
-					<option value="이사원">staff222 이사원</option>
-					<option value="박사원">staff333 박사원</option>
-					<option value="김대리">amanager111 김대리</option>
-					<option value="이대리">amanager222 이대리</option>
-				</select>
+				<c:if test="${memLevel != '부장'}">
+					<select name="select" id="select">
+						<option>선택하세요</option>
+						<c:forEach items="${memList}" var="memList">
+						<option value="${memList.memId}">${memList.memName}</option>
+						</c:forEach>
+					</select>
+				</c:if>
+				
+				<c:if test="${memLevel == '부장'}">
+					<select name="select" id="select">
+						<option>선택하세요</option>
+						<c:forEach items="${memList}" var="memList">
+						<option value="${memList.memId}">${memList.memName}</option>
+						</c:forEach>
+					</select>
+				</c:if>
 			</td>
 		</tr>
 		<tr>
@@ -62,7 +73,7 @@ function cl(){
 		<tr>
 			<td>대리자:</td>
 			<td>
-				<input type="text" id="dr" readonly="readonly" />
+				<input type="text" id="dr" readonly="readonly" value="${memName}(${memLevel})" />
 			</td>
 		</tr>
 		<tr>

@@ -123,5 +123,53 @@ public class CpServiceImpl implements CpService{
 		// TODO Auto-generated method stub
 		return cpDao.list2();
 	}
+
+	@Override
+	public String kLevel(String memLevel) {
+		// TODO Auto-generated method stub
+		return cpDao.kLevel(memLevel);
+	}
+
+	@Override
+	public List<Map<String, Object>> memList(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.memList(map);
+	}
+
+	@Override
+	public String kLevel2(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.kLevel2(map);
+	}
+
+	@Override
+	public int insertDP(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.insertDP(map);
+	}
+
+	@Override
+	public String dLevel(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.dLevel(map);
+	}
+
+	@Override
+	public Map<String, Object> drSmem(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.drSmem(map);
+	}
+
+	@Override
+	public int updateDP(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.updateDP(map);
+	}
+
+	@Override
+	public Map<String, Object> payDate(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.payDate(map);
+	}
 	
 }
