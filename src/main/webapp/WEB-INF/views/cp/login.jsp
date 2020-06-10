@@ -61,6 +61,13 @@
 			
 			<tr>
 				<th><input type="button" id="btnLogin" value="로그인"/></th>
+				<td>
+					<input type="hidden" name="op1" value="" />
+					<input type="hidden" name="keyword" value="" />
+					<input type="hidden" name="data1" value="" />
+					<input type="hidden" name="data2" value="" />
+					<input type="hidden" name="op2" value="" />
+				</td>
 			</tr>
 		</table>
 	</form>	

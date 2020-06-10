@@ -171,5 +171,45 @@ public class CpServiceImpl implements CpService{
 		// TODO Auto-generated method stub
 		return cpDao.payDate(map);
 	}
+
+	@Override
+	public int totalCount(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.totalCount(map);
+	}
+
+	@Override
+	public Map<String, Object> paging(int curPage, int count) {
+
+		int BLOCK_SCALE = 7;
+		int totPage = (int) Math.ceil(count*1.0 / 10);
+		int curBlock = (int)Math.ceil((curPage-1) / BLOCK_SCALE)+1; 
+		int prevPage = (curPage == 1)? 1:(curBlock-1)*BLOCK_SCALE;
+		int blockBegin = (curBlock-1)*BLOCK_SCALE+1; 
+		int blockEnd = blockBegin+BLOCK_SCALE-1;
+		if(blockEnd > totPage) blockEnd = totPage;
+		int totBlock = (int)Math.ceil(totPage / BLOCK_SCALE); 
+		int nextPage = curBlock > totBlock ? (curBlock*BLOCK_SCALE) : (curBlock*BLOCK_SCALE)+1;
+		if(nextPage >= totPage) nextPage = totPage;
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("curPage", curPage);
+		map.put("totPage", totPage);
+		map.put("BLOCK_SCALE", BLOCK_SCALE);
+		map.put("curBlock", curBlock);
+		map.put("prevPage", prevPage);
+		map.put("blockBegin", blockBegin);
+		map.put("blockEnd", blockEnd);
+		map.put("totBlock", totBlock);
+		map.put("nextPage", nextPage);
+		
+		return map;
+	}
+
+	@Override
+	public String setMemId(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.setMemId(map);
+	}
 	
 }

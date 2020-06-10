@@ -9,31 +9,42 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <script>
+function goPage(num){
+	$("#curPage").val(num);
+	$("#btnSearch").click();
+}
+
 function popup(){
 	var url = "dr";
 	var name = "popup test";
-	var option = "width = 300, height = 200, top = 100, left = 200, location = no"
+	var option = "width = 500, height = 200, top = 100, left = 200, location = no"
 	window.open(url, name, option);
 }
+
 	$(function(){
 		//달력
-	    $("#testDatepicker").datepicker({
-	    	dateFormat: 'yy-mm-dd'
-	    });
-	    $("#testDatepickerr").datepicker({
-	    	dateFormat: 'yy-mm-dd'
+		$("#testDatepicker").click(function(){
+			$("#testDatepicker").datepicker({
+		    	dateFormat: 'yy-mm-dd'
+		    });
+		});
+  	    
+		$("#testDatepicker").click(function(){
+	    	$("#testDatepickerr").datepicker({
+	    		dateFormat: 'yy-mm-dd'
+	    	});
 	    });
 		
 	    //검색버튼클릭
 	    $("#btnSearch").click(function(){
-			$("#frm").attr("method", "get").attr("action","search").submit();
+			$("#frm").attr("method", "get").attr("action","list").submit();
 		});
 	    
 	    //select option2 ajax
 		$("#op2").change(function(){
 			$.ajax({
 					type : "get",
-					url : "ajaxList",
+					url : "list",
 					data : $("#frm").serialize(),
 					success : function(data) {
 										$("#ajax").html(data);
@@ -55,7 +66,7 @@ function popup(){
 <meta charset="UTF-8">
 <title>detail</title>
 </head>
-<body>
+<body id="ajax">
 <form id="frm" name="frm">
 	<table>
 		<tr>
@@ -76,6 +87,8 @@ function popup(){
 			<td>
 				<input type="hidden" name="seq" value="${sessionloginInfo.memSeq}" />
 				<input type="hidden" name="level" value="${sessionloginInfo.memLevel}" />
+				<input type="hidden" name="curPage" id="curPage" value="1" />
+				<input type="hidden" name="listSize" value="10" />
 			</td>
 		</tr>
 		<tr>
@@ -122,43 +135,57 @@ function popup(){
 				<th>결재자</th>
 				<th>결재상태</th>
 			</tr>
-			<c:forEach items="${searchList}" var="searchList">
-			<tr onclick="location.href='paypage?seq=${searchList.boardSeq}'">
-				<td>${searchList.boardSeq}</td>
-				<td>${searchList.boardWriter}</td>
-				<td>${searchList.boardSubject}</td>
-				<td>${searchList.boardRegdate}</td>
-				<td>${searchList.boardUpdate}</td>
-				<td>${searchList.boardPasser}</td>
-				<td>${searchList.boardState}</td>
-			</tr>
-			<input type="hidden" name="boardSeq" value="${searchList.boardSeq}" />
-			<input type="hidden" name="boardWriter" value="${searchList.boardWriter}" />
-			<input type="hidden" name="boardSubject" value="${searchList.boardSubject}" />
-			<input type="hidden" name="boardRegdate" value="${searchList.boardRegdate}" />
-			<input type="hidden" name="boardUpdate" value="${searchList.boardUpdate}" />
-			<input type="hidden" name="boardPasser" value="${searchList.boardPasser}" />
-			<input type="hidden" name="boardState" value="${searchList.boardState}" />
-			</c:forEach>
 			<c:forEach items="${writeList}" var="writeList">
 			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'">
 				<td>${writeList.boardSeq}</td>
-				<td>${writeList.boardWriter}</td>
+				<td>${writeList.boardWriterKR}</td>
 				<td>${writeList.boardSubject}</td>
 				<td>${writeList.boardRegdate}</td>
 				<td>${writeList.boardUpdate}</td>
-				<td>${writeList.boardPasser}</td>
+				<td>${writeList.boardPasserKR}</td>
 				<td>${writeList.boardState}</td>
 			</tr>
 			<input type="hidden" name="boardSeq" value="${writeList.boardSeq}" />
-			<input type="hidden" name="boardWriter" value="${writeList.boardWriter}" />
+			<input type="hidden" name="boardWriter" value="${writeList.boardWriterKR}" />
 			<input type="hidden" name="boardSubject" value="${writeList.boardSubject}" />
 			<input type="hidden" name="boardRegdate" value="${writeList.boardRegdate}" />
 			<input type="hidden" name="boardUpdate" value="${writeList.boardUpdate}" />
 			<input type="hidden" name="boardPasser" value="${writeList.boardPasser}" />
 			<input type="hidden" name="boardState" value="${writeList.boardState}" />
 			</c:forEach>
-		</table>	
+
+			<tr align="center">
+				<td colspan="7">
+					 <c:if test="${pageMap.curBlock > 1}">
+		                    <a href="javascript:goPage('1')">[처음]</a>
+		                </c:if>
+		                <!-- **이전페이지 블록으로 이동 : 현재 페이지 블럭이 1보다 크면 [이전]하이퍼링크를 화면에 출력 -->
+		                <c:if test="${pageMap.curBlock > 1}">
+		                    <a href="javascript:goPage('${pageMap.prevPage}')">[이전]</a>
+		                </c:if>
+		                <!-- **하나의 블럭에서 반복문 수행 시작페이지부터 끝페이지까지 -->
+		                <c:forEach var="num" begin="${pageMap.blockBegin}" end="${pageMap.blockEnd}">
+		                    <!-- **현재페이지이면 하이퍼링크 제거 -->
+		                    <c:choose>
+		                        <c:when test="${num == pageMap.curPage}">
+		                            <span style="color: red">${num}</span>&nbsp;
+		                        </c:when>
+		                        <c:otherwise>
+		                            <a href="javascript:goPage('${num}')">${num}</a>&nbsp;
+		                        </c:otherwise>
+		                    </c:choose>
+		                </c:forEach>
+		                <!-- **다음페이지 블록으로 이동 : 현재 페이지 블럭이 전체 페이지 블럭보다 작거나 같으면 [다음]하이퍼링크를 화면에 출력 -->
+		                <c:if test="${pageMap.curBlock <= pageMap.totBlock}">
+		                    <a href="javascript:goPage('${pageMap.nextPage}')">[다음]</a>
+		                </c:if>
+		                <!-- **끝페이지로 이동 : 현재 페이지가 전체 페이지보다 작거나 같으면 [끝]하이퍼링크를 화면에 출력 -->
+		                <c:if test="${pageMap.curPage <= pageMap.totPage}">
+		                    <%-- <a href="javascript:goPage('${pageMap.totPage}')">[끝]</a> --%>
+		                </c:if>
+		             </td>
+               </tr> 
+		</table>
 </form>	
 </body>
 </html>

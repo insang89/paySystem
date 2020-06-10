@@ -13,7 +13,10 @@ $(function(){
 	
 	var boardState = $("#boardState").val(); // 글상태
 	var memLevel = $("#memLevel").val(); // 직급
-	
+	var memDrPay = $("#memDrPay").val(); // 대리결재권한
+	console.log(boardState);
+	console.log(memLevel);
+	console.log(memDrPay);
 	//결재
 	$("#btnEnroll").click(function(){
 		if(boardState == '임시저장' && (memLevel == 'staff' || memLevel == 'amanager')){
@@ -53,7 +56,7 @@ $(function(){
 		$("#ban").prop("type", "hidden");
 	}
 	
-	if(memLevel == 'staff' || memLevel == 'amanager'){ // 사원 대리
+	if((memDrPay == null || memDrPay == '' || memDrPay == 'null') && (memLevel == 'staff' || memLevel == 'amanager')){ // 사원 대리
 		$("#ban").prop("type", "hidden");
  		if(boardState=="결재대기"){
  			$("#subject").attr("readonly", "readonly");
@@ -70,7 +73,7 @@ $(function(){
  		}
 	}
 	
-	if(memLevel == 'manager'){ // 과장
+	if(memLevel == 'manager' || memDrPay == 'manager'){ // 과장
 		if(boardState=="결재대기"){
 			$("#subject").attr("readonly", "readonly");
  			$("#content").attr("readonly", "readonly");
@@ -85,7 +88,7 @@ $(function(){
 		}
 	}
 	
-	if(memLevel == 'gmanager'){ // 부장
+	if(memLevel == 'gmanager' || memDrPay == 'gmanager'){ // 부장
 		if(boardState=="반려" || boardState=="결재완료"){
 			$("#subject").attr("readonly", "readonly");
  			$("#content").attr("readonly", "readonly");
@@ -146,6 +149,7 @@ $(function(){
 				<input type="hidden" id="boardState" name="boardState" value="${writeInfo.boardState}" />
 				<input type="hidden" id="memName" value="${session.memName}" />
 				<input type="hidden" id="memLevel" value="${session.memLevel}" />
+				<input type="hidden" id="memDrPay" value="${session.memDrPay}" />
 			</td>
 		</tr>
 	</table>

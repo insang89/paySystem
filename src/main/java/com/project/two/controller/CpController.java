@@ -1,6 +1,5 @@
 package com.project.two.controller;
 
-import java.time.chrono.IsoEra;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.swing.border.EmptyBorder;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,7 +45,7 @@ public class CpController {
 		loginInfo = cpService.login(map); // 로그인 정보를 담음
 		
 		if(loginInfo.containsKey("memDrPay") == false) { // 대리결재 권한이 없는경우
-			loginInfo.put("memDrPay", null);
+			loginInfo.put("memDrPay", "null");
 //			loginInfo.put("payDate", ""); // 권한받은 날짜
 		}
 		else { // 권한이 있는경우 권한받은 날짜를 세션에 넣음 
@@ -79,34 +77,60 @@ public class CpController {
 				session.setAttribute("number", 99);
 			}
 			
-			session.setAttribute("sessionloginInfo", loginInfo); // 로그인정보를 세션에 담음
+			loginInfo.put("op1",map.get("op1"));
+			loginInfo.put("op2",map.get("op2"));
+			loginInfo.put("keyword",map.get("keyword"));
+			loginInfo.put("data1",map.get("data1"));
+			loginInfo.put("data2",map.get("data2"));
 			
+			session.setAttribute("sessionloginInfo", loginInfo); // 로그인정보를 세션에 담음
+
 			return "redirect:list";
 		}
 	}//login
 	
 	//게시판 글목록 조회
 	@RequestMapping("list")
-	public String list(Model model, HttpSession session) {
+	public String list(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
 		if(session.getAttribute("sessionloginInfo") == null) {
 			return "redirect:loginPage";
 		}
+		if(map.isEmpty()) {
+			map.put("curPage", 1);
+			map.put("listSize", 10);
+		}
 		
 		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
-		Map<String, Object> map = new HashMap<String, Object>();
 		
 		map.put("id", sessionMap.get("memId").toString());
 		map.put("seq", sessionMap.get("memSeq").toString());
 		map.put("level", sessionMap.get("memLevel").toString());
 		map.put("memDrPay", sessionMap.get("memDrPay").toString());
 		
+		int totPage = cpService.totalCount(map);
+		int curPage = Integer.parseInt(map.get("curPage").toString());
+		
+		Map<String, Object> map2 = cpService.paging(curPage, totPage); 
+		
+		map.put("Tcnt", totPage);
+		map.put("curPage", map2.get("curPage"));
+		map.put("totPage", map2.get("totPage"));
+		map.put("BLOCK_SCALE", map2.get("BLOCK_SCALE"));
+		map.put("curBlock", map2.get("curBlock"));
+		map.put("prevPage", map2.get("prevPage"));
+		map.put("blockBegin", map2.get("blockBegin"));
+		map.put("blockEnd", map2.get("blockEnd"));
+		map.put("totBlock", map2.get("totBlock"));
+		map.put("nextPage", map2.get("nextPage"));
+		
+		model.addAttribute("pageMap", map);
+		
+		map.put("listSize", 10);
+		
 		String dLevel = cpService.dLevel(map);
 		model.addAttribute("dLevel", dLevel);
 		
-		Map<String, Object> smemInfo = (Map<String, Object>)session.getAttribute("smemInfo");
-		System.out.println(smemInfo);
-		map.put("smemLevel", smemInfo.get("MEMLEVEL").toString());
-		map.put("payDate", smemInfo.get("DP_DATE").toString());
+		map.put("setMemId",cpService.setMemId(map));
 		
 		List<Map<String, Object>> writeList = new ArrayList<Map<String, Object>>();
 		writeList = cpService.writeList(map); // 로그인시 글목록을 불러옴
@@ -120,29 +144,18 @@ public class CpController {
 			model.addAttribute("flag", 1);
 		}
 		
-		return "cp/detail";
-	}//list
-	
-	//검색
-	@RequestMapping("search")
-	public String search(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
-		
-		List<Map<String, Object>> searchList = new ArrayList<Map<String, Object>>();
-		
-		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
-		
-		map.put("id", sessionMap.get("memId").toString());
-		
-		searchList = cpService.search(map); // 검색된 글목록을 불러옴
-		model.addAttribute("searchList", searchList);
 		model.addAttribute("map", map);
 		
 		return "cp/detail";
-	}//search
+	}//list
 	
 	//결제페이지
 	@RequestMapping("paypage")
 	public String paypage(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
+		
+		if(session.getAttribute("sessionloginInfo") == null) {
+			return "redirect:loginPage";
+		}
 		
 		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
 		model.addAttribute("session", sessionMap);
@@ -164,7 +177,9 @@ public class CpController {
 		map.put("id", sessionMap.get("memId"));
 		map.put("memLevel", sessionMap.get("memLevel"));
 		
-		List<Map<String, Object>> ajaxSearch = cpService.ajaxList(map);
+		
+		
+		List<Map<String, Object>> ajaxSearch = cpService.writeList(map);
 		model.addAttribute("ajaxSearch", ajaxSearch);
 		return "cp/ajaxList";
 	}//ajaxList
@@ -225,7 +240,11 @@ public class CpController {
 	
 	//글쓰기 버튼 클릭시 페이지
 	@RequestMapping("writePage")
-	public String writePage(@RequestParam Map<String, Object> map, Model model) {
+	public String writePage(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
+	
+		if(session.getAttribute("sessionloginInfo") == null) {
+			return "redirect:loginPage";
+		}
 		
 		int count = cpService.count(); // 시퀀스+1 (새글)
 		model.addAttribute("count", count);
@@ -301,7 +320,6 @@ public class CpController {
 			System.out.println(logInsert);
 			int listUpdate = cpService.payButton(map);
 			System.out.println(listUpdate);
-			
 		}
 		
 		if("manager".equals(memLevel)) { // 과장이면
@@ -351,13 +369,31 @@ public class CpController {
 
 		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo");
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("smem", sessionMap.get("memId").toString());
-		map.put("gmem", select);
-		int insertDP = cpService.insertDP(map);
-		System.out.println(insertDP);
 		
-		int updateDP = cpService.updateDP(map);
-		System.out.println(updateDP);
+		String setMemberLevel = sessionMap.get("memLevel").toString();
+		String setMemberId = sessionMap.get("memId").toString();
+		
+		if(setMemberLevel.equals("manager")) { //과장이 권한 주었을때
+			map.put("smem","manager");
+			map.put("gmem",select);
+			int memLevelUpdate = cpService.updateDP(map);
+			System.out.println(memLevelUpdate);
+			map.put("setMemberId",setMemberId);
+			int insertDP = cpService.insertDP(map);
+			System.out.println(insertDP);
+		}
+		
+		else if(setMemberLevel.equals("gmanager")) { //부장이 권한 주었을때
+			map.put("smem","gmanager");
+			map.put("gmem",select);
+			int memLevelUpdate = cpService.updateDP(map);
+			System.out.println(memLevelUpdate);
+			map.put("setMemberId",setMemberId);
+			int insertDP = cpService.insertDP(map);
+			System.out.println(insertDP);
+		}
+		
+		map.put("gmem", select);
 		
 		return "redirect:dr";
 	}

@@ -170,5 +170,17 @@ public class CpDaoImpl implements CpDao{
 		// TODO Auto-generated method stub
 		return sqlSession.selectOne("mapper.payDate", map);
 	}
+
+	@Override
+	public int totalCount(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.totalCount", map);
+	}
+
+	@Override
+	public String setMemId(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectOne("mapper.setMemId", map);
+	}
 	
 }

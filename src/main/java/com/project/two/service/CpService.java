@@ -56,5 +56,11 @@ public interface CpService {
 	int updateDP(Map<String, Object> map);
 
 	Map<String, Object> payDate(Map<String, Object> map);
+
+	int totalCount(Map<String, Object> map);
+
+	Map<String, Object> paging(int curPage, int totPage);
+
+	String setMemId(Map<String, Object> map);
 	
 }

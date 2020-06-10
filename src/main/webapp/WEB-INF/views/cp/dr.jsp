@@ -17,7 +17,20 @@ function cl(){
 	$(function(){
 		
 		$("#pass").click(function(){
+			
+			var select = $("#select").val();
+			
+			if(select == '선택하세요'){
+				alert("대리결재자를 선택하세요");
+				return false;
+			}
+			
+			else{
 			$("#frm").attr("method", "post").attr("action","drr").submit();
+			alert("승인완료");
+			window.close();
+			}
+			
 		});
 		
 		$("#select").change(function(){
