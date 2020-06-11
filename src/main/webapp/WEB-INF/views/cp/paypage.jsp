@@ -14,6 +14,8 @@ $(function(){
 	var boardState = $("#boardState").val(); // 글상태
 	var memLevel = $("#memLevel").val(); // 직급
 	var memDrPay = $("#memDrPay").val(); // 대리결재권한
+	var boardWriter = $("#boardWriter").val(); // 작성자
+	var memId = $("#memId").val(); // 로그인한사람아이디
 	console.log(boardState);
 	console.log(memLevel);
 	console.log(memDrPay);
@@ -49,8 +51,6 @@ $(function(){
 		$("#chk2").prop("checked", false);
 		$("#chk3").prop("checked", false);
 	}
-
-	var boardWriter = $("#").val(); // 현재글 작성자
 	
 	if(boardState == '임시저장'){
 		$("#ban").prop("type", "hidden");
@@ -79,7 +79,10 @@ $(function(){
  			$("#content").attr("readonly", "readonly");
  			$("#imsi").prop("type", "hidden");
 		}
-		if(boardState=="결재중" || boardState=="결재완료" || boardState=="반려"){
+		if(boardWriter == memId && boardState == '반려'){
+			$("#ban").prop("type", "hidden");
+		}
+		if((boardState=="결재중" || boardState=="결재완료" || boardState=="반려") && boardWriter != memId){
 			$("#subject").attr("readonly", "readonly");
  			$("#content").attr("readonly", "readonly");
  			$("#imsi").prop("type", "hidden");
@@ -127,7 +130,7 @@ $(function(){
 			<td>번호: <input type="text" readonly="readonly" value="${writeInfo.boardSeq}" /></td>
 		</tr>
 		<tr>
-			<td>작성자: <input type="text" readonly="readonly" name="boardWriter" value="${writeInfo.boardWriter}" /></td>
+			<td>작성자: <input type="text" readonly="readonly" id="boardWriterKR" name="boardWriterKR" value="${writeInfo.boardWriterKR}" /></td>
 		</tr>
 		<tr>
 			<td>제목: <input type="text" id="subject"  name="subject" value="${writeInfo.boardSubject}" /></td>
@@ -145,11 +148,13 @@ $(function(){
 				<input type="hidden" name="boardUpdate" value="${writeInfo.boardUpdate}" />
 				<input type="hidden" name="boardPasser" value="${writeInfo.boardPasser}" />
 				<input type="hidden" name="boardSeq" value="${writeInfo.boardSeq}" />
+				<input type="hidden" name="boardWriter" id="boardWriter" value="${writeInfo.boardWriter}" />
 				<input type="hidden" name="memLevel" value="${sessionloginInfo.memLevel}" />
 				<input type="hidden" id="boardState" name="boardState" value="${writeInfo.boardState}" />
 				<input type="hidden" id="memName" value="${session.memName}" />
 				<input type="hidden" id="memLevel" value="${session.memLevel}" />
-				<input type="hidden" id="memDrPay" value="${session.memDrPay}" />
+				<input type="hidden" id="memDrPay" name="memDrPay" value="${session.memDrPay}" />
+				<input type="hidden" id="memId" name="memId" value="${session.memId}" />
 			</td>
 		</tr>
 	</table>

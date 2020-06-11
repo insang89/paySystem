@@ -9,8 +9,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <script>
-
-	$(function(){		
+	$(function(){
 		//로그인버튼 클릭시
 		$("#btnLogin").click(function(){
 			if($("#id").val()=='') {
@@ -24,7 +23,7 @@
 				$("#pwd").focus();
 				return;
 			}
-			
+
 			$("#frm").attr("method", "post").attr("action","login").submit();
 		});
 	});	

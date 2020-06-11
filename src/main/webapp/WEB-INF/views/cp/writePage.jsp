@@ -61,6 +61,7 @@ $(function(){
 				<input type="hidden" name="name" value="${sessionloginInfo.memId}" />
 				<input type="hidden" name="boardWriter" value="${sessionloginInfo.memId}" />
 				<input type="hidden" name="level" value="${sessionloginInfo.memLevel}" />
+				<input type="hidden" name="memDrPay" value="${sessionloginInfo.memDrPay}" />
 			</td>
 		</tr>
 	</table>

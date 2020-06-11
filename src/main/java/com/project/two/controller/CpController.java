@@ -106,6 +106,7 @@ public class CpController {
 		map.put("seq", sessionMap.get("memSeq").toString());
 		map.put("level", sessionMap.get("memLevel").toString());
 		map.put("memDrPay", sessionMap.get("memDrPay").toString());
+		map.put("setMemId",cpService.setMemId(map));
 		
 		int totPage = cpService.totalCount(map);
 		int curPage = Integer.parseInt(map.get("curPage").toString());
@@ -129,8 +130,6 @@ public class CpController {
 		
 		String dLevel = cpService.dLevel(map);
 		model.addAttribute("dLevel", dLevel);
-		
-		map.put("setMemId",cpService.setMemId(map));
 		
 		List<Map<String, Object>> writeList = new ArrayList<Map<String, Object>>();
 		writeList = cpService.writeList(map); // 로그인시 글목록을 불러옴
@@ -177,8 +176,6 @@ public class CpController {
 		map.put("id", sessionMap.get("memId"));
 		map.put("memLevel", sessionMap.get("memLevel"));
 		
-		
-		
 		List<Map<String, Object>> ajaxSearch = cpService.writeList(map);
 		model.addAttribute("ajaxSearch", ajaxSearch);
 		return "cp/ajaxList";
@@ -187,6 +184,7 @@ public class CpController {
 	//글등록
 	@RequestMapping("writeEnroll")
 	public String writeEnroll(@RequestParam Map<String, Object> map, HttpSession session) {
+		
 		int Enroll = cpService.enroll(map);
 		System.out.println(Enroll);
 		
@@ -313,7 +311,9 @@ public class CpController {
 		String memId = sessionMap.get("memId").toString();
 		map.put("memId", memId);
 		
-		if("staff".equals(memLevel) || "amanager".equals(memLevel)) { // 사원 대리이면
+		
+		
+		if(("staff".equals(memLevel) || "amanager".equals(memLevel)) && "null".equals(map.get("memDrPay"))) { // 사원 대리이면
 			String state = "paywait";
 			map.put("state", state);
 			int logInsert = cpService.logInsert2(map);
@@ -322,7 +322,7 @@ public class CpController {
 			System.out.println(listUpdate);
 		}
 		
-		if("manager".equals(memLevel)) { // 과장이면
+		if("manager".equals(memLevel) || "manager".equals(map.get("memDrPay"))) { // 과장이면
 			String state = "paing";
 			map.put("state", state);
 			int payButton = cpService.payButton(map); // update
@@ -331,7 +331,7 @@ public class CpController {
 			System.out.println(logInsert);
 			return "redirect:list";
 		}
-		else if("gmanager".equals(memLevel)) { // 부장이면
+		else if("gmanager".equals(memLevel) || "gmanager".equals(map.get("memDrPay"))) { // 부장이면
 			String state = "paid";
 			map.put("state", state);
 			int payButton = cpService.payButton(map); // update
