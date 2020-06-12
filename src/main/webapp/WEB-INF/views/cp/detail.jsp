@@ -5,7 +5,10 @@
 <html>
 <head>
 <style>
-
+.a {
+	text-align: center;
+	width: 70px;
+}
 .ft {
 	color: blue;
 	font-weight: bold;
@@ -44,15 +47,16 @@ body{
 	background-color: white;
 }
 
-.table {
-	border: solid 1px;
-	border-color: gray;
-	width: 700px;
-}
-
-td {
-	height: 25px;
-}
+  table {
+    width: 1000px;
+    border: 1px solid #444444;
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid #444444;
+    padding: 5px;
+    height: 17px;
+  }
 
 .blink {
       -webkit-animation: blink 1.0s linear infinite;
@@ -68,6 +72,10 @@ td {
         to {color:#000;} 
         */
         }
+
+.wr {
+	margin-right: 500px;
+}
 
 </style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
@@ -134,13 +142,22 @@ function popup(){
 </head>
 <body id="ajax">
 <form id="frm" name="frm">
+
+				<c:if test="${number == 3}" >
+				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
+				</c:if>
+				<c:if test="${number == 99}" >
+				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
+				<input type="button" class="bt1" onclick="popup()" value="대리결재" />
+				</c:if>
+
 	<table>
 		<tr>
-			<td>
+			<td align="center">
 				<c:if test="${flag != 1}">
 				<span class='ft'>${sessionloginInfo.memName}(${dLevel})</span>님 환영합니다 - <span class='ft'>${sMem.MEM_NAME}(${sMem.MEM_LEVEL})</span>님 환영합니다
-				<input type="button" class="bt1" onclick="location.href='loginPage'" value="로그아웃" /><br>
 				<span class='blink'>(대리결재일 : ${sMem.DP_DATE})</span>
+				<input type="button" class="bt1" onclick="location.href='loginPage'" value="로그아웃" /><br>
 				</c:if>
 				
 				<c:if test="${flag == 1}">
@@ -153,19 +170,11 @@ function popup(){
 				<input type="hidden" name="level" value="${sessionloginInfo.memLevel}" />
 				<input type="hidden" name="curPage" id="curPage" value="1" />
 				<input type="hidden" name="listSize" value="10" />
-		<tr>
+
+		<tr align="center">
 			<td>
-				<c:if test="${number == 3}" >
-				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
-				</c:if>
-				<c:if test="${number == 99}" >
-				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
-				<input type="button" class="bt1" onclick="popup()" value="대리결재" />
-				</c:if>
-			</td>
-		</tr>
-		<tr>
-			<td>
+				<input type="text" name="date1" class='a' id="testDatepicker" value="${map.date1}" placeholder="날짜선택" autocomplete="off" /> ~
+				<input type="text" name="date2" class='a' id="testDatepickerr" value="${map.date2}" placeholder="날짜선택" autocomplete="off" /><br>
 				<select name="op1" id="op1">
 					<option value="select">선택</option>
 					<option value="writer" <c:if test="${map.op1 == 'writer'}">selected</c:if>>작성자</option>
@@ -180,10 +189,9 @@ function popup(){
 					<option value="paing" <c:if test="${map.op2 == 'paing'}">selected</c:if>>결재중</option>
 					<option value="paid" <c:if test="${map.op2 == 'paid'}">selected</c:if>>결재완료</option>
 					<option value="ban" <c:if test="${map.op2 == 'ban'}">selected</c:if>>반려</option>
-				</select><br>
-				<input type="text" name="date1" id="testDatepicker" value="${map.date1}" placeholder="날짜선택" autocomplete="off" /> ~
-				<input type="text" name="date2" id="testDatepickerr" value="${map.date2}" placeholder="날짜선택" autocomplete="off" />
-				<input type="button" class="bt1" id="btnSearch" value="검색" />
+				</select>
+				<input type="button" class="bt1" class='a' id="btnSearch" value="검색" />
+				<br>
 			</td>
 		</tr>
 		</table>
@@ -198,7 +206,7 @@ function popup(){
 				<th>결재상태</th>
 			</tr>
 			<c:forEach items="${writeList}" var="writeList">
-			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'" id="tr">
+			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'" id="tr" style="cursor: pointer;">
 				<td align="center">${writeList.boardSeq}</td>
 				<td align="center">${writeList.boardWriterKR}</td>
 				<td align="center">${writeList.boardSubject}</td>
@@ -248,6 +256,9 @@ function popup(){
 		             </td>
                </tr> 
 		</table>
+		
+
+		
 </form>	
 </body>
 </html>

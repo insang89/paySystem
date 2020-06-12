@@ -93,11 +93,11 @@ body{
 	<form id="frm" name="frm">
 		<table>
 			<tr>
-				<th><input type="text" id="id" name="id" placeholder="아이디" value="${inputId}" /></th>
+				<th><input type="text" id="id" name="id" placeholder="아이디" value="${inputId}" style="text-align: left: ;" /></th>
 			</tr>
 			
 			<tr>
-				<th><input type="password" id="pwd" name="pwd" placeholder="비밀번호"/></th>
+				<th><input type="password" id="pwd" name="pwd" placeholder="비밀번호" style="text-align: left: ;" /></th>
 			</tr>
 			
 			<tr id="tr">
