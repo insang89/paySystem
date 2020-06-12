@@ -66,8 +66,8 @@
                   ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer_kr
                   ,board_writer
                   ,board_subject
-                  ,board_regdate
-                  ,board_uptdate
+                  ,to_char(board_regdate,'yyyy-MM-dd') board_regdate
+                  ,to_char(board_uptdate,'yyyy-MM-dd') board_uptdate
                   ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer_kr
                   ,board_passer
                   ,board_state
@@ -129,8 +129,23 @@
 		<if test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
-	    and NOT(board_state = 'paywait')
-	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
+	    and NOT(board_state = 'paywait' and board_writer != #{id})
+	    <choose>
+	    	<when test="level == 'gmanager'">
+	    	and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
+	    	</when>
+	    	<otherwise>
+	    	and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and (board_state = 'ban' and board_writer != #{id}))
+	    	</otherwise>
+	    </choose>
+	    <choose>
+	    	<when test="memDrPay == 'gmanager'">
+	    	and NOT(board_state = 'paid' and board_passer != #{id})
+	    	</when>
+	    	<otherwise>
+	    	and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    	</otherwise>
+	    </choose>
 		</if>
 
 		<choose>

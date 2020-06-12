@@ -311,8 +311,6 @@ public class CpController {
 		String memId = sessionMap.get("memId").toString();
 		map.put("memId", memId);
 		
-		
-		
 		if(("staff".equals(memLevel) || "amanager".equals(memLevel)) && "null".equals(map.get("memDrPay"))) { // 사원 대리이면
 			String state = "paywait";
 			map.put("state", state);

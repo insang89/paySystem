@@ -3,6 +3,51 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
+<style>
+
+.bt1 {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  }
+
+input[type=text]:focus {
+  background-color: lightblue;
+}
+
+input[type=text] {
+   height: 25px;
+}
+
+input[type=password] {
+   height: 25px;
+}
+	
+input[type=password]:focus {
+  background-color: lightblue;
+} 
+
+table{
+	display : table;
+	margin-top : 17%;
+	margin-left : auto;
+	margin-right : auto;
+	padding: 50px;
+	background-color: white;
+}
+
+body{
+	background-color: white;
+}
+
+</style>
 <head>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
@@ -48,18 +93,15 @@
 	<form id="frm" name="frm">
 		<table>
 			<tr>
-				<th>아이디:</th>
-				<th><input type="text" id="id" name="id" placeholder="아이디를 입력하세요" value="${inputId}" /></th>
+				<th><input type="text" id="id" name="id" placeholder="아이디" value="${inputId}" /></th>
 			</tr>
 			
 			<tr>
-				<th>비밀번호:</th>
-				<!-- 나중에 type password로 바꾸기 -->
-				<th><input type="password" id="pwd" name="pwd" placeholder="비밀번호를 입력하세요"/></th>
+				<th><input type="password" id="pwd" name="pwd" placeholder="비밀번호"/></th>
 			</tr>
 			
-			<tr>
-				<th><input type="button" id="btnLogin" value="로그인"/></th>
+			<tr id="tr">
+				<td colspan="2" align="center"><input type="button" class="bt1" id="btnLogin" value="로그인"/></td>
 				<td>
 					<input type="hidden" name="op1" value="" />
 					<input type="hidden" name="keyword" value="" />

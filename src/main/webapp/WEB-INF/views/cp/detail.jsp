@@ -4,6 +4,72 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+
+.ft {
+	color: blue;
+	font-weight: bold;
+}
+
+select {
+	height: 25px;
+}
+
+input[type=text] {
+   height: 21px;
+}
+
+#tr:hover {
+  background-color: orange;
+  }
+  
+.bt1 {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  }
+  
+body{
+	display : table;
+	margin-left : auto;
+	margin-right : auto;
+	padding: 30px;
+	background-color: white;
+}
+
+.table {
+	border: solid 1px;
+	border-color: gray;
+	width: 700px;
+}
+
+td {
+	height: 25px;
+}
+
+.blink {
+      -webkit-animation: blink 1.0s linear infinite;
+      font-weight: bold;
+        }
+@keyframes blink {
+       /*0% 부터 100% 까지*/ 
+        0% { color:black;}
+        50% { color:yellow;}
+        100% {color:red; }
+        /*from부터 to 까지         
+        from {color:#00a0e9;}
+        to {color:#000;} 
+        */
+        }
+
+</style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -72,33 +138,29 @@ function popup(){
 		<tr>
 			<td>
 				<c:if test="${flag != 1}">
-				${sessionloginInfo.memName}(${dLevel})님 환영합니다 - ${sMem.MEM_NAME}(${sMem.MEM_LEVEL})님 환영합니다
-				<input type="button" onclick="location.href='loginPage'" value="로그아웃" /><br>
-				(대리결재일 : ${sMem.DP_DATE})
+				<span class='ft'>${sessionloginInfo.memName}(${dLevel})</span>님 환영합니다 - <span class='ft'>${sMem.MEM_NAME}(${sMem.MEM_LEVEL})</span>님 환영합니다
+				<input type="button" class="bt1" onclick="location.href='loginPage'" value="로그아웃" /><br>
+				<span class='blink'>(대리결재일 : ${sMem.DP_DATE})</span>
 				</c:if>
 				
 				<c:if test="${flag == 1}">
-				${sessionloginInfo.memName}(${dLevel})님 환영합니다
-				<input type="button" onclick="location.href='loginPage'" value="로그아웃" /><br>
+				<span class='ft'>${sessionloginInfo.memName}(${dLevel})</span>님 환영합니다
+				<input type="button" class="bt1" onclick="location.href='loginPage'" value="로그아웃" /><br>
 				</c:if>
 			</td>
 		</tr>
-		<tr>
-			<td>
 				<input type="hidden" name="seq" value="${sessionloginInfo.memSeq}" />
 				<input type="hidden" name="level" value="${sessionloginInfo.memLevel}" />
 				<input type="hidden" name="curPage" id="curPage" value="1" />
 				<input type="hidden" name="listSize" value="10" />
-			</td>
-		</tr>
 		<tr>
 			<td>
 				<c:if test="${number == 3}" >
-				<input type="button" onclick="location.href='writePage'" value="글쓰기" />
+				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
 				</c:if>
 				<c:if test="${number == 99}" >
-				<input type="button" onclick="location.href='writePage'" value="글쓰기" />
-				<input type="button" onclick="popup()" value="대리결재" />
+				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
+				<input type="button" class="bt1" onclick="popup()" value="대리결재" />
 				</c:if>
 			</td>
 		</tr>
@@ -119,13 +181,13 @@ function popup(){
 					<option value="paid" <c:if test="${map.op2 == 'paid'}">selected</c:if>>결재완료</option>
 					<option value="ban" <c:if test="${map.op2 == 'ban'}">selected</c:if>>반려</option>
 				</select><br>
-				<input type="text" name="date1" id="testDatepicker" value="${map.date1}" placeholder="날짜를 선택하세요" autocomplete="off" /> ~
-				<input type="text" name="date2" id="testDatepickerr" value="${map.date2}" placeholder="날짜를 선택하세요" autocomplete="off" />
-				<input type="button" id="btnSearch" value="검색" />
+				<input type="text" name="date1" id="testDatepicker" value="${map.date1}" placeholder="날짜선택" autocomplete="off" /> ~
+				<input type="text" name="date2" id="testDatepickerr" value="${map.date2}" placeholder="날짜선택" autocomplete="off" />
+				<input type="button" class="bt1" id="btnSearch" value="검색" />
 			</td>
 		</tr>
 		</table>
-		<table border="1" id="ajax">
+		<table class="table" border="1" id="ajax">
 			<tr>
 				<th>번호</th>
 				<th>작성자</th>
@@ -136,14 +198,14 @@ function popup(){
 				<th>결재상태</th>
 			</tr>
 			<c:forEach items="${writeList}" var="writeList">
-			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'">
-				<td>${writeList.boardSeq}</td>
-				<td>${writeList.boardWriterKR}</td>
-				<td>${writeList.boardSubject}</td>
-				<td>${writeList.boardRegdate}</td>
-				<td>${writeList.boardUpdate}</td>
-				<td>${writeList.boardPasserKR}</td>
-				<td>${writeList.boardState}</td>
+			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'" id="tr">
+				<td align="center">${writeList.boardSeq}</td>
+				<td align="center">${writeList.boardWriterKR}</td>
+				<td align="center">${writeList.boardSubject}</td>
+				<td align="center">${writeList.boardRegdate}</td>
+				<td align="center">${writeList.boardUpdate}</td>
+				<td align="center">${writeList.boardPasserKR}</td>
+				<td align="center">${writeList.boardState}</td>
 			</tr>
 			<input type="hidden" name="boardSeq" value="${writeList.boardSeq}" />
 			<input type="hidden" name="boardWriter" value="${writeList.boardWriterKR}" />

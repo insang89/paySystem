@@ -73,7 +73,7 @@ $(function(){
  		}
 	}
 	
-	if(memLevel == 'manager' || memDrPay == 'manager'){ // 과장
+	if(memLevel == 'manager' || memDrPay == 'manager'){ // 과장 & 과장권한부여
 		if(boardState=="결재대기"){
 			$("#subject").attr("readonly", "readonly");
  			$("#content").attr("readonly", "readonly");
@@ -89,10 +89,15 @@ $(function(){
  			$("#ban").prop("type", "hidden");
  			$("#btnEnroll").prop("type", "hidden");
 		}
+		if(boardState == '결재중' || boardState=="결재완료" && boardWriter == memId){
+			$("#imsi").prop("type", "hidden");
+ 			$("#ban").prop("type", "hidden");
+ 			$("#btnEnroll").prop("type", "hidden");
+		}
 	}
 	
 	if(memLevel == 'gmanager' || memDrPay == 'gmanager'){ // 부장
-		if(boardState=="반려" || boardState=="결재완료"){
+		if((boardState=="반려" || boardState=="결재완료") && boardWriter != memId){
 			$("#subject").attr("readonly", "readonly");
  			$("#content").attr("readonly", "readonly");
  			$("#imsi").prop("type", "hidden");
@@ -103,6 +108,19 @@ $(function(){
 			$("#subject").attr("readonly", "readonly");
  			$("#content").attr("readonly", "readonly");
  			$("#imsi").prop("type", "hidden");
+		}
+		if(boardState == '결재대기' && boardWriter == memId){
+			$("#imsi").prop("type", "hidden");
+ 			$("#ban").prop("type", "hidden");
+ 			$("#btnEnroll").prop("type", "hidden");
+		}
+		if(boardState == '반려' && boardWriter == memId) {
+			
+		}
+		if(boardState == '결재완료' && boardWriter == memId) {
+			$("#imsi").prop("type", "hidden");
+ 			$("#ban").prop("type", "hidden");
+ 			$("#btnEnroll").prop("type", "hidden");
 		}
 	}
 });
