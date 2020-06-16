@@ -4,15 +4,39 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+
+.bt1 {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  }
+  
+</style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <script>
+function goBack() {
+	window.history.back();
+}
+
 $(function(){
 	//결재
 	$("#btnEnroll").click(function(){
 		$("#frm").attr("method", "get").attr("action","writeEnroll").submit();
+	});
+	
+	$("#btnBack").click(function(){
+		$("#frm").attr("method", "get").attr("action","list").submit();
 	});
 	
 	//임시저장
@@ -55,8 +79,9 @@ $(function(){
 		</tr>
 		<tr>
 			<td>
-				<input type="button" id="imsi" value="임시저장" />
-				<input type="button" id="btnEnroll" value="결재" />
+				<input type="button" class="bt1" id="imsi" value="임시저장" />
+				<input type="button" class="bt1" id="btnEnroll" value="결재" />
+				<input type="button" class="bt1" onclick="goBack()" value="뒤로" />
 				
 				<input type="hidden" name="name" value="${sessionloginInfo.memId}" />
 				<input type="hidden" name="boardWriter" value="${sessionloginInfo.memId}" />

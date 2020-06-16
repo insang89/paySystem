@@ -5,18 +5,28 @@
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
 
-<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-<property name="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
-<property name="username" value="system"/>
-<property name="password" value="1234"/>
-</bean>
+<bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
+        <property name="username" value="system"/>
+        <property name="password" value="1234"/>
+    </bean>
 
 <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
-<property name="dataSource" ref="dataSource" />
-<property name="mapperLocations" value="classpath:/mapper/*.xml" />
-</bean> <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-<constructor-arg index="0" ref="sqlSession"/>
+	<property name="dataSource" ref="dataSource" />
+	<property name="mapperLocations" value="classpath:/mapper/*.xml" />
+</bean> 
+<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+	<constructor-arg index="0" ref="sqlSession"/>
 </bean>
+<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  "/>
+			</bean>
+		</property>
+	</bean>		
 		
 </beans>

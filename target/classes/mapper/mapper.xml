@@ -24,6 +24,7 @@
 	<result column="board_passer_kr" property="boardPasserKR"/>
 	<result column="board_state" property="boardState"/>
 	<result column="board_content" property="boardContent"/>
+	<result column="board_state_en" property="boardStateEN"/>
 </resultMap>
 
 <resultMap type="map" id="logList">
@@ -49,32 +50,34 @@
 </select>
 
 <select id="writeList" parameterType="map" resultMap="boardList">
-	select
-                rownum
-			   ,c.board_seq
-		       ,c.board_writer_kr
-		       ,c.board_subject
-		       ,c.board_regdate
-		       ,c.board_uptdate
-		       ,c.board_passer_kr
-		       ,c.board_passer
-		       ,decode(c.board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
-	from (
-			select 
-                    rownum
-				  ,board_seq
-                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer_kr
-                  ,board_writer
-                  ,board_subject
-                  ,to_char(board_regdate,'yyyy-MM-dd') board_regdate
-                  ,to_char(board_uptdate,'yyyy-MM-dd') board_uptdate
-                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer_kr
-                  ,board_passer
-                  ,board_state
-  			 from cp_board b
-  			 order by board_seq desc
-          ) c
-	where 1=1
+		select
+	                rownum
+				   ,c.board_seq
+			       ,c.board_writer_kr
+			       ,c.board_subject
+			       ,c.board_regdate
+			       ,c.board_uptdate
+			       ,c.board_passer_kr
+			       ,c.board_passer
+			       ,decode(c.board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
+			       ,c.board_content
+		from (
+				select 
+	                    rownum
+					  ,board_seq
+	                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer_kr
+	                  ,board_writer
+	                  ,board_subject
+	                  ,to_char(board_regdate,'yyyy-MM-dd') board_regdate
+	                  ,to_char(board_uptdate,'yyyy-MM-dd') board_uptdate
+	                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer_kr
+	                  ,board_passer
+	                  ,board_state
+	                  ,board_content
+	  			 from cp_board b
+	  			 order by board_seq desc
+	          ) c
+		where 1=1
 		<choose>
 			<when test="op1 == null or op1 == '' or op1 == 'null'">
 			</when>
@@ -86,6 +89,9 @@
 	    	</when>
 	    	<when test="op1 == 'passer'">
 	    	and board_passer_kr like '%' || #{keyword} || '%'
+	    	</when>
+	    	<when test="op1 == 'subcon'">
+	    	and (board_subject like '%' || #{keyword} || '%' or board_content like '%' || #{keyword} || '%') 
 	    	</when>
 	    </choose>
    		<if test="curPage != null">
@@ -103,50 +109,24 @@
 		</if>
 	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
 	    and NOT(board_state = 'imsi' and board_writer != #{id})
-		and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
-		and NOT(board_state = 'paing' and board_passer != #{id})
+		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
 	    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
 		</if>
-<!-- 과장권한 받았을때 -->		
-<!-- 		
-		<if test="memDrPay == 'manager'"> 
-		and NOT(board_state = 'imsi' and board_writer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{setMemId}))
-		and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_log where log_passer = #{setMemId}))
-		and NOT(board_state = 'paing' and board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_passer and a.mem_id = #{setMemId}))
-		and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{setMemId}))
-		</if>
- -->
- <!-- 부장권한 받았을떄 -->
-<!-- 	
-		<if test="memDrPay == 'gmanager' "> 
-		and NOT(board_state = 'imsi'
-				and board_writer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{setMemId}))
-	    and NOT(board_state = 'paywait')
-	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{setMemId}) and board_state = 'ban')
-		</if>
- -->
 		
-		<if test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
+		<choose>
+		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
 	    and NOT(board_state = 'paywait' and board_writer != #{id})
-	    <choose>
-	    	<when test="level == 'gmanager'">
-	    	and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
-	    	</when>
-	    	<otherwise>
-	    	and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and (board_state = 'ban' and board_writer != #{id}))
-	    	</otherwise>
+	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    </when>
+	    <when test="!(level == 'gmanager' or memDrPay == 'gmanager') and !(level == 'manager' or memDrPay == 'manager')">
+	    and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and (board_state = 'ban' and board_writer != #{id}))
+	    </when>
 	    </choose>
-	    <choose>
-	    	<when test="memDrPay == 'gmanager'">
-	    	and NOT(board_state = 'paid' and board_passer != #{id})
-	    	</when>
-	    	<otherwise>
-	    	and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
-	    	</otherwise>
-	    </choose>
-		</if>
 
 		<choose>
 			<when test="op2 == null or op2 == '' or op2 == 'null'">
@@ -164,6 +144,7 @@
 		       ,c.board_passer_kr
 		       ,c.board_passer
 		       ,c.board_state
+		       ,c.board_content
                having rownum between (#{listSize}*(#{curPage}-1)+1) and (#{listSize}*(#{curPage}-1)+10)
 	order by rownum asc
 </select>
@@ -248,6 +229,7 @@
 		       ,board_uptdate
 		       ,board_passer
 		       ,decode(board_state, 'imsi', '임시저장', 'paywait', '결재대기', 'paing', '결재중', 'paid', '결재완료', 'ban', '반려') board_state
+		       ,board_state_en
 	from (select 
 						  board_seq
 		                  ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer_kr
@@ -257,6 +239,7 @@
 		                  ,board_uptdate
 		                  ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer
 		                  ,board_state
+		                  ,board_state board_state_en
           			 from cp_board b)
 	where board_seq = #{seq}
 </select>
@@ -460,10 +443,11 @@
                       ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer_kr
                       ,board_passer
                       ,board_state
+                      ,board_content
                     from cp_board b
                 )
         where 1=1
-        <choose>
+		<choose>
 			<when test="op1 == null or op1 == '' or op1 == 'null'">
 			</when>
 	    	<when test="op1 == 'writer'">
@@ -475,49 +459,49 @@
 	    	<when test="op1 == 'passer'">
 	    	and board_passer_kr like '%' || #{keyword} || '%'
 	    	</when>
-    	</choose>
-    	<choose>
+	    	<when test="op1 == 'subcon'">
+	    	and (board_subject like '%' || #{keyword} || '%' or board_content like '%' || #{keyword} || '%') 
+	    	</when>
+	    </choose>
+	    <choose>
 	    	<when test="date1 == null or date1 == '' or date1 == 'null'">
 	    	</when>
 			<when test="date1 != null and date2 != null">
 		    and to_char(board_regdate, 'yyyy-mm-dd') between #{date1} and #{date2}
 		    </when>
-    	</choose>
-		<if test="(memDrPay == null or memDrPay == '' or memDrPay == 'null') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+	    </choose>
+		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
 		and board_writer = #{id}
 		</if>
-	 	<if test="level == 'manager'"> <!-- 과장 -->
-	    and NOT(board_state = 'imsi' and board_writer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id})) 
-		and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
-		and NOT(board_state = 'paing' and board_passer != #{id})
+	 	<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+		and board_writer = #{id}
+		</if>
+	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
+	    and NOT(board_state = 'imsi' and board_writer != #{id})
+		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
 	    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
 		</if>
 		
-		<if test="memDrPay == 'manager'"> <!-- 과장권한 받았을때 -->
-		and NOT(board_state = 'imsi' and board_writer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{setMemId}))
-		and NOT(board_state = 'ban' and NOT board_seq in (select board_seq from cp_log where log_passer = #{setMemId}))
-		and NOT(board_state = 'paing' and board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_passer and a.mem_id = #{setMemId}))
-		and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{setMemId}))
-		</if>
-		
-		<if test="memDrPay == 'gmanager'"> <!-- 부장권한 받았을떄 -->
-		and NOT(board_state = 'imsi'
-				and board_writer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{setMemId}))
-	    and NOT(board_state = 'paywait')
-	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{setMemId}) and board_state = 'ban')
-		</if>
-		
-		<if test="level == 'gmanager'"> <!-- 부장 -->
+		<choose>
+		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
 	    and NOT(board_state = 'imsi'
-				and board_writer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}))
-	    and NOT(board_state = 'paywait')
-	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and board_state = 'ban' )
-		</if>
+				and board_writer != #{id})
+	    and NOT(board_state = 'paywait' and board_writer != #{id})
+	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    </when>
+	    <when test="!(level == 'gmanager' or memDrPay == 'gmanager') and !(level == 'manager' or memDrPay == 'manager')">
+	    and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and (board_state = 'ban' and board_writer != #{id}))
+	    </when>
+	    </choose>
+
 		<choose>
 			<when test="op2 == null or op2 == '' or op2 == 'null'">
 			</when>
 			<when test="op2 != 'state'">
-			and board_state = #{op2}		
+			and board_state = #{op2}
 			</when>
 		</choose>
 </select>

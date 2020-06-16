@@ -4,11 +4,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+.bt1 {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  }  
+</style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <script>
+function goBack() {
+	window.history.back();
+}
+
 $(function(){
 	
 	var boardState = $("#boardState").val(); // 글상태
@@ -90,6 +108,8 @@ $(function(){
  			$("#btnEnroll").prop("type", "hidden");
 		}
 		if(boardState == '결재중' || boardState=="결재완료" && boardWriter == memId){
+			$("#subject").attr("readonly", "readonly");
+ 			$("#content").attr("readonly", "readonly");
 			$("#imsi").prop("type", "hidden");
  			$("#ban").prop("type", "hidden");
  			$("#btnEnroll").prop("type", "hidden");
@@ -110,14 +130,18 @@ $(function(){
  			$("#imsi").prop("type", "hidden");
 		}
 		if(boardState == '결재대기' && boardWriter == memId){
+			$("#subject").attr("readonly", "readonly");
+ 			$("#content").attr("readonly", "readonly");
 			$("#imsi").prop("type", "hidden");
  			$("#ban").prop("type", "hidden");
  			$("#btnEnroll").prop("type", "hidden");
 		}
 		if(boardState == '반려' && boardWriter == memId) {
-			
+			$("#ban").prop("type", "hidden");
 		}
 		if(boardState == '결재완료' && boardWriter == memId) {
+			$("#subject").attr("readonly", "readonly");
+ 			$("#content").attr("readonly", "readonly");
 			$("#imsi").prop("type", "hidden");
  			$("#ban").prop("type", "hidden");
  			$("#btnEnroll").prop("type", "hidden");
@@ -158,9 +182,10 @@ $(function(){
 		</tr>
 		<tr>
 			<td>
-				<input type="button" id="imsi" value="임시저장" />
-				<input type="button" id="ban" value="반려" />
-				<input type="button" id="btnEnroll" value="결재" />
+				<input type="button" class="bt1" id="imsi" value="임시저장" />
+				<input type="button" class="bt1" id="ban" value="반려" />
+				<input type="button" class="bt1" id="btnEnroll" value="결재" />
+				<input type="button" class="bt1" onclick="goBack()" value="뒤로" />
 				
 				<input type="hidden" name="memSeq" value="${sessionloginInfo.memSeq}" />
 				<input type="hidden" name="boardUpdate" value="${writeInfo.boardUpdate}" />
@@ -169,6 +194,7 @@ $(function(){
 				<input type="hidden" name="boardWriter" id="boardWriter" value="${writeInfo.boardWriter}" />
 				<input type="hidden" name="memLevel" value="${sessionloginInfo.memLevel}" />
 				<input type="hidden" id="boardState" name="boardState" value="${writeInfo.boardState}" />
+				<input type="hidden" id="boardStateEN" name="boardStateEN" value="${writeInfo.boardStateEN}" />
 				<input type="hidden" id="memName" value="${session.memName}" />
 				<input type="hidden" id="memLevel" value="${session.memLevel}" />
 				<input type="hidden" id="memDrPay" name="memDrPay" value="${session.memDrPay}" />

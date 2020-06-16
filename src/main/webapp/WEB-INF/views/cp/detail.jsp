@@ -8,19 +8,19 @@
 .a {
 	text-align: center;
 	width: 70px;
-}
+		}
 .ft {
 	color: blue;
 	font-weight: bold;
-}
+		}
 
 select {
 	height: 25px;
-}
+		}
 
 input[type=text] {
    height: 21px;
-}
+		}
 
 #tr:hover {
   background-color: orange;
@@ -45,23 +45,24 @@ body{
 	margin-right : auto;
 	padding: 30px;
 	background-color: white;
-}
+		}
 
   table {
     width: 1000px;
     border: 1px solid #444444;
     border-collapse: collapse;
-  }
+ 		 }
   th, td {
     border: 1px solid #444444;
     padding: 5px;
     height: 17px;
-  }
+  		}
 
 .blink {
       -webkit-animation: blink 1.0s linear infinite;
       font-weight: bold;
         }
+        
 @keyframes blink {
        /*0% 부터 100% 까지*/ 
         0% { color:black;}
@@ -75,7 +76,7 @@ body{
 
 .wr {
 	margin-right: 500px;
-}
+	}
 
 </style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
@@ -83,6 +84,40 @@ body{
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <script>
+function printClock() {
+    
+    var clock = document.getElementById("clock");            // 출력할 장소 선택
+    var currentDate = new Date();                                     // 현재시간
+    var calendar = currentDate.getFullYear() + "-" + (currentDate.getMonth()+1) + "-" + currentDate.getDate() // 현재 날짜
+    var amPm = 'AM'; // 초기값 AM
+    var currentHours = addZeros(currentDate.getHours(),2); 
+    var currentMinute = addZeros(currentDate.getMinutes() ,2);
+    var currentSeconds =  addZeros(currentDate.getSeconds(),2);
+    
+    if(currentHours >= 12){ // 시간이 12보다 클 때 PM으로 세팅, 12를 빼줌
+    	amPm = 'PM';
+    	currentHours = addZeros(currentHours - 12,2);
+    }
+
+    if(currentSeconds >= 50){// 50초 이상일 때 색을 변환해 준다.
+       currentSeconds = '<span style="color:#de1951;">'+currentSeconds+'</span>'
+    }
+    clock.innerHTML = currentHours+":"+currentMinute+":"+currentSeconds +" <span style='font-size:23px;'>"+ amPm+"</span>"; //날짜를 출력해 줌
+    
+    setTimeout("printClock()",1000);         // 1초마다 printClock() 함수 호출
+}
+
+function addZeros(num, digit) { // 자릿수 맞춰주기
+	  var zero = '';
+	  num = num.toString();
+	  if (num.length < digit) {
+	    for (i = 0; i < digit - num.length; i++) {
+	      zero += '0';
+	    }
+	  }
+	  return zero + num;
+}
+
 function goPage(num){
 	$("#curPage").val(num);
 	$("#btnSearch").click();
@@ -140,7 +175,8 @@ function popup(){
 <meta charset="UTF-8">
 <title>detail</title>
 </head>
-<body id="ajax">
+<body id="ajax" onload="printClock()">
+
 <form id="frm" name="frm">
 
 				<c:if test="${number == 3}" >
@@ -150,6 +186,7 @@ function popup(){
 				<input type="button" class="bt1" onclick="location.href='writePage'" value="글쓰기" />
 				<input type="button" class="bt1" onclick="popup()" value="대리결재" />
 				</c:if>
+				<div style="width:150px; color:black;font-size:23px; text-align:center;" id="clock"></div>
 
 	<table>
 		<tr>
@@ -166,6 +203,7 @@ function popup(){
 				</c:if>
 			</td>
 		</tr>
+		
 				<input type="hidden" name="seq" value="${sessionloginInfo.memSeq}" />
 				<input type="hidden" name="level" value="${sessionloginInfo.memLevel}" />
 				<input type="hidden" name="curPage" id="curPage" value="1" />
@@ -180,6 +218,7 @@ function popup(){
 					<option value="writer" <c:if test="${map.op1 == 'writer'}">selected</c:if>>작성자</option>
 					<option value="subject" <c:if test="${map.op1 == 'subject'}">selected</c:if>>제목</option>
 					<option value="passer" <c:if test="${map.op1 == 'passer'}">selected</c:if>>결재자</option>
+					<option value="subcon" <c:if test="${map.op1 == 'subcon'}">selected</c:if>>제목+내용</option>
 				</select>				
 				<input type="text" id="keyword" name="keyword" placeholder="검색어를 입력하세요" value="${map.keyword}" />
 				<select name="op2" id="op2">
@@ -200,6 +239,7 @@ function popup(){
 				<th>번호</th>
 				<th>작성자</th>
 				<th>제목</th>
+				<th>내용</th>
 				<th>작성일</th>
 				<th>결재일</th>
 				<th>결재자</th>
@@ -210,6 +250,7 @@ function popup(){
 				<td align="center">${writeList.boardSeq}</td>
 				<td align="center">${writeList.boardWriterKR}</td>
 				<td align="center">${writeList.boardSubject}</td>
+				<td align="center">${writeList.boardContent}</td>
 				<td align="center">${writeList.boardRegdate}</td>
 				<td align="center">${writeList.boardUpdate}</td>
 				<td align="center">${writeList.boardPasserKR}</td>
@@ -218,6 +259,7 @@ function popup(){
 			<input type="hidden" name="boardSeq" value="${writeList.boardSeq}" />
 			<input type="hidden" name="boardWriter" value="${writeList.boardWriterKR}" />
 			<input type="hidden" name="boardSubject" value="${writeList.boardSubject}" />
+			<input type="hidden" name="boardContent" value="${writeList.boardContent}" />
 			<input type="hidden" name="boardRegdate" value="${writeList.boardRegdate}" />
 			<input type="hidden" name="boardUpdate" value="${writeList.boardUpdate}" />
 			<input type="hidden" name="boardPasser" value="${writeList.boardPasser}" />
@@ -225,7 +267,7 @@ function popup(){
 			</c:forEach>
 
 			<tr align="center">
-				<td colspan="7">
+				<td colspan="8">
 					 <c:if test="${pageMap.curBlock > 1}">
 		                    <a href="javascript:goPage('1')">[처음]</a>
 		                </c:if>

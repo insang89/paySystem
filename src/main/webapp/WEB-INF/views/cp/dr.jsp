@@ -4,6 +4,20 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+.bt1 {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 7px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+  }
+</style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -91,8 +105,8 @@ function cl(){
 		</tr>
 		<tr>
 			<td>
-				<input type="button" id="pass" value="승인" />
-				<input type="button" onclick="cl()" value="창닫기" />
+				<input type="button" class="bt1" id="pass" value="승인" />
+				<input type="button" class="bt1" onclick="cl()" value="닫기" />
 			</td>
 		</tr>
 	</table>

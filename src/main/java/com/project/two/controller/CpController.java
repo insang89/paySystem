@@ -330,13 +330,18 @@ public class CpController {
 			return "redirect:list";
 		}
 		else if("gmanager".equals(memLevel) || "gmanager".equals(map.get("memDrPay"))) { // 부장이면
-			String state = "paid";
-			map.put("state", state);
+
+			if("imsi".equals(map.get("boardStateEN")) || "ban".equals(map.get("boardStateEN"))) {
+				map.put("state", "paywait");
+				map.put("memDrPay", "null");
+			}
+			else if("paing".equals(map.get("boardStateEN"))) {
+				map.put("state", "paid");
+			}
 			int payButton = cpService.payButton(map); // update
 			System.out.println(payButton);
 			int logInsert = cpService.logInsert2(map); // insert
 			System.out.println(logInsert);
-			return "redirect:list";
 		}
 		return "redirect:list";
 	}
