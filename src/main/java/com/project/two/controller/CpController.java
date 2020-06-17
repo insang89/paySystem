@@ -113,6 +113,10 @@ public class CpController {
 		
 		int totPage = cpService.totalCount(map);
 		
+		if(totPage == 0) {
+			model.addAttribute("ck", "true");
+		}			
+		
 		List<Map<String, Object>> seqListMap = cpService.seqList(map);
 		List<Integer> seqList = new ArrayList<Integer>();
 		

@@ -244,6 +244,8 @@ function popup(){
 				<th>결재자</th>
 				<th>결재상태</th>
 			</tr>
+			
+			<c:if test="${ck != 'true'}">
 			<c:forEach items="${writeList}" var="writeList">
 			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'" id="tr" style="cursor: pointer;">
 				<td align="center">${writeList.boardSeq}</td>
@@ -255,6 +257,7 @@ function popup(){
 				<td align="center">${writeList.boardPasserKR}</td>
 				<td align="center">${writeList.boardState}</td>
 			</tr>
+				
 			<input type="hidden" name="boardSeq" value="${writeList.boardSeq}" />
 			<input type="hidden" name="boardWriter" value="${writeList.boardWriterKR}" />
 			<input type="hidden" name="boardSubject" value="${writeList.boardSubject}" />
@@ -264,6 +267,13 @@ function popup(){
 			<input type="hidden" name="boardPasser" value="${writeList.boardPasser}" />
 			<input type="hidden" name="boardState" value="${writeList.boardState}" />
 			</c:forEach>
+			</c:if>
+
+			<c:if test="${ck == 'true'}">
+				<tr>
+					<td colspan="8" align="center"><img src="https://topclass.chosun.com/upload/topp/2019-04/simg_org/sp.jpg"></td>
+				</tr>
+			</c:if>	
 
 			<tr align="center">
 				<td colspan="8">
