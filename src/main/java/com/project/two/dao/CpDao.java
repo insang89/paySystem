@@ -1,5 +1,6 @@
 package com.project.two.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,5 +61,7 @@ public interface CpDao {
 	int totalCount(Map<String, Object> map);
 
 	String setMemId(Map<String, Object> map);
+
+	List<Map<String, Object>> seqList(Map<String, Object> map);
 	
 }

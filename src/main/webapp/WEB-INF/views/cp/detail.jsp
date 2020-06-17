@@ -79,11 +79,10 @@ body{
 	}
 
 </style>
-<script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
-<script>
+<script type="text/javascript">
 function printClock() {
     
     var clock = document.getElementById("clock");            // 출력할 장소 선택
@@ -269,7 +268,7 @@ function popup(){
 			<tr align="center">
 				<td colspan="8">
 					 <c:if test="${pageMap.curBlock > 1}">
-		                    <a href="javascript:goPage('1')">[처음]</a>
+		                    <!-- <a href="javascript:goPage('1')">[처음]</a> -->
 		                </c:if>
 		                <!-- **이전페이지 블록으로 이동 : 현재 페이지 블럭이 1보다 크면 [이전]하이퍼링크를 화면에 출력 -->
 		                <c:if test="${pageMap.curBlock > 1}">
@@ -298,8 +297,6 @@ function popup(){
 		             </td>
                </tr> 
 		</table>
-		
-
 		
 </form>	
 </body>

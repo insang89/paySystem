@@ -101,7 +101,7 @@
 	    	<when test="date1 == null or date1 == '' or date1 == 'null'">
 	    	</when>
 			<when test="date1 != null and date2 != null">
-		    and to_char(board_regdate, 'yyyy-mm-dd') between #{date1} and #{date2}
+		    and board_regdate between #{date1} and #{date2}
 		    </when>
 	    </choose>
 		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
@@ -109,8 +109,8 @@
 		</if>
 	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
 	    and NOT(board_state = 'imsi' and board_writer != #{id})
-		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
-		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 	    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
 		</if>
 		
@@ -119,8 +119,8 @@
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
 	    and NOT(board_state = 'paywait' and board_writer != #{id})
-	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
-	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 	    </when>
 	    <when test="!(level == 'gmanager' or memDrPay == 'gmanager') and !(level == 'manager' or memDrPay == 'manager')">
 	    and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
@@ -429,7 +429,7 @@
 	where dp_gmem = #{id}
 </select>
 
-<select id="totalCount" parameterType="map" resultType="integer">
+<select id="totalCount" parameterType="map" resultType="Integer">
 		select count(board_seq)
 		from (
                     select 
@@ -467,7 +467,7 @@
 	    	<when test="date1 == null or date1 == '' or date1 == 'null'">
 	    	</when>
 			<when test="date1 != null and date2 != null">
-		    and to_char(board_regdate, 'yyyy-mm-dd') between #{date1} and #{date2}
+		    and board_regdate between #{date1} and #{date2}
 		    </when>
 	    </choose>
 		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
@@ -478,8 +478,8 @@
 		</if>
 	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
 	    and NOT(board_state = 'imsi' and board_writer != #{id})
-		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
-		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 	    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
 		</if>
 		
@@ -488,8 +488,8 @@
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
 	    and NOT(board_state = 'paywait' and board_writer != #{id})
-	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
-	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer = (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 	    </when>
 	    <when test="!(level == 'gmanager' or memDrPay == 'gmanager') and !(level == 'manager' or memDrPay == 'manager')">
 	    and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
@@ -510,6 +510,80 @@
 	select dp_smem
 	from cp_dp
 	where dp_gmem = #{id}
+</select>
+
+<select id="seqList" parameterType="map" resultMap="boardList">
+	select board_seq
+		from (
+                    select 
+                        rownum
+                      ,board_seq
+                      ,(select mem_name from cp_member a where a.mem_id = b.board_writer) board_writer_kr
+                      ,board_writer
+                      ,board_subject
+                      ,board_regdate
+                      ,board_uptdate
+                      ,(select mem_name from cp_member a where a.mem_id = b.board_passer) board_passer_kr
+                      ,board_passer
+                      ,board_state
+                      ,board_content
+                    from cp_board b
+                )
+        where 1=1
+		<choose>
+			<when test="op1 == null or op1 == '' or op1 == 'null'">
+			</when>
+	    	<when test="op1 == 'writer'">
+	    	and board_writer_kr like '%' || #{keyword} || '%'
+	    	</when>
+	    	<when test="op1 == 'subject'">
+	    	and board_subject like '%' || #{keyword} || '%'
+	    	</when>
+	    	<when test="op1 == 'passer'">
+	    	and board_passer_kr like '%' || #{keyword} || '%'
+	    	</when>
+	    	<when test="op1 == 'subcon'">
+	    	and (board_subject like '%' || #{keyword} || '%' or board_content like '%' || #{keyword} || '%') 
+	    	</when>
+	    </choose>
+	    <choose>
+	    	<when test="date1 == null or date1 == '' or date1 == 'null'">
+	    	</when>
+			<when test="date1 != null and date2 != null">
+		    and board_regdate between #{date1} and #{date2}
+		    </when>
+	    </choose>
+		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+		and board_writer = #{id}
+		</if>
+	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
+	    and NOT(board_state = 'imsi' and board_writer != #{id})
+		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'paid' and NOT board_seq in (select board_seq from cp_log where log_passer = #{id}))
+		</if>
+		
+		<choose>
+		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
+	    and NOT(board_state = 'imsi'
+				and board_writer != #{id})
+	    and NOT(board_state = 'paywait' and board_writer != #{id})
+	    and NOT(board_state = 'paid' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    </when>
+	    <when test="!(level == 'gmanager' or memDrPay == 'gmanager') and !(level == 'manager' or memDrPay == 'manager')">
+	    and NOT(board_state = 'paid' and NOT(board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
+	    and NOT(board_passer_kr != (select distinct mem_name from cp_member a, cp_board b where a.mem_id = b.board_writer and a.mem_id = #{id}) and (board_state = 'ban' and board_writer != #{id}))
+	    </when>
+	    </choose>
+
+		<choose>
+			<when test="op2 == null or op2 == '' or op2 == 'null'">
+			</when>
+			<when test="op2 != 'state'">
+			and board_state = #{op2}
+			</when>
+		</choose>
 </select>
 
 </mapper>

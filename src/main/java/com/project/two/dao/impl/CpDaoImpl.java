@@ -1,5 +1,6 @@
 package com.project.two.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -181,6 +182,12 @@ public class CpDaoImpl implements CpDao{
 	public String setMemId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return sqlSession.selectOne("mapper.setMemId", map);
+	}
+
+	@Override
+	public List<Map<String, Object>> seqList(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.selectList("mapper.seqList", map);
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.project.two.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,7 +182,7 @@ public class CpServiceImpl implements CpService{
 	@Override
 	public Map<String, Object> paging(int curPage, int count) {
 
-		int BLOCK_SCALE = 7;
+		int BLOCK_SCALE = 5;
 		int totPage = (int) Math.ceil(count*1.0 / 10);
 		int curBlock = (int)Math.ceil((curPage-1) / BLOCK_SCALE)+1; 
 		int prevPage = (curPage == 1)? 1:(curBlock-1)*BLOCK_SCALE;
@@ -210,6 +211,12 @@ public class CpServiceImpl implements CpService{
 	public String setMemId(Map<String, Object> map) {
 		// TODO Auto-generated method stub
 		return cpDao.setMemId(map);
+	}
+
+	@Override
+	public List<Map<String, Object>> seqList(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return cpDao.seqList(map);
 	}
 	
 }

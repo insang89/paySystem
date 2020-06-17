@@ -18,31 +18,28 @@
   cursor: pointer;
   }
 </style>
-<script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
-<script>
+<script type="text/javascript">
 
 function cl(){
 	window.close();
 }
  
 	$(function(){
-		
 		$("#pass").click(function(){
 			
 			var select = $("#select").val();
 			
-			if(select == '선택하세요'){
+			if(select == 'sel'){
 				alert("대리결재자를 선택하세요");
-				return false;
 			}
 			
 			else{
-			$("#frm").attr("method", "post").attr("action","drr").submit();
-			alert("승인완료");
-			window.close();
+				$("#frm").attr("method", "POST").attr("action","drr").submit();
+				alert("승인완료");
+				window.close();
 			}
 			
 		});
@@ -72,23 +69,14 @@ function cl(){
 		<tr>
 			<td>대리결재자:</td>
 			<td>
-				<c:if test="${memLevel != '부장'}">
+
 					<select name="select" id="select">
-						<option>선택하세요</option>
+						<option value="sel">선택하세요</option>
 						<c:forEach items="${memList}" var="memList">
 						<option value="${memList.memId}">${memList.memName}</option>
 						</c:forEach>
 					</select>
-				</c:if>
-				
-				<c:if test="${memLevel == '부장'}">
-					<select name="select" id="select">
-						<option>선택하세요</option>
-						<c:forEach items="${memList}" var="memList">
-						<option value="${memList.memId}">${memList.memName}</option>
-						</c:forEach>
-					</select>
-				</c:if>
+
 			</td>
 		</tr>
 		<tr>
