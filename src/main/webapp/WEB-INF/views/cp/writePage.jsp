@@ -18,6 +18,9 @@
   margin: 4px 2px;
   cursor: pointer;
   }
+body {
+	background-image:url('https://www.waglebagle.net/uploads/editor/20190611142816.png');
+}
   
 </style>
 <script src="/resources/js/jquery-3.5.0.min.js" type="text/javascript"></script>

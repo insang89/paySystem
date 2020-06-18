@@ -44,7 +44,7 @@ body{
 	margin-left : auto;
 	margin-right : auto;
 	padding: 30px;
-	background-color: white;
+	background-image:url('https://www.waglebagle.net/uploads/editor/20190611142816.png');
 		}
 
   table {
@@ -273,7 +273,7 @@ function popup(){
 				<tr>
 					<td colspan="8" align="center"><img src="https://topclass.chosun.com/upload/topp/2019-04/simg_org/sp.jpg"></td>
 				</tr>
-			</c:if>	
+			</c:if>
 
 			<tr align="center">
 				<td colspan="8">
