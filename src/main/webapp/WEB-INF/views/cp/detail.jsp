@@ -47,12 +47,12 @@ body{
 	background-image:url('https://www.waglebagle.net/uploads/editor/20190611142816.png');
 		}
 
-  table {
+table {
     width: 1000px;
     border: 1px solid #444444;
     border-collapse: collapse;
  		 }
-  th, td {
+th, td {
     border: 1px solid #444444;
     padding: 5px;
     height: 17px;

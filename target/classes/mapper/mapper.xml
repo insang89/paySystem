@@ -35,6 +35,7 @@
 	<result column="log_writer" property="logWriter"/>
 </resultMap>
 
+<!-- 로그인 사용자 정보 조회 -->
 <select id="loginInfo" parameterType="map" resultMap="mapList">
 	select 
 			 mem_seq
@@ -49,6 +50,7 @@
 	where mem_id = #{id}
 </select>
 
+<!-- 글목록 & 동기, 비동기 조회 -->
 <select id="writeList" parameterType="map" resultMap="boardList">
 		select
 	                rownum
@@ -104,10 +106,10 @@
 		    and board_regdate between #{date1} and #{date2}
 		    </when>
 	    </choose>
-		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')">
 		and board_writer = #{id}
 		</if>
-	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
+	 	<if test="level == 'manager' or memDrPay == 'manager'"> 
 	    and NOT(board_state = 'imsi' and board_writer != #{id})
 		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
@@ -115,7 +117,7 @@
 		</if>
 		
 		<choose>
-		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
+		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> 
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
 	    and NOT(board_state = 'paywait' and board_writer != #{id})
@@ -149,6 +151,7 @@
 	order by rownum asc
 </select>
 
+<!-- 글쓰기 페이지에서 글등록 -->
 <insert id="enroll" parameterType="map">
 	insert into cp_board  (
 						   board_seq
@@ -196,6 +199,7 @@
 				    	   )
 </insert>
 
+<!-- 임시저장 글등록 -->
 <insert id="imsiEnroll" parameterType="map">
 	insert into cp_board  (
 						   board_seq
@@ -219,6 +223,7 @@
 						  )
 </insert>
 
+<!-- jsp tr 글정보 조회 -->
 <select id="writeInfo" parameterType="Integer" resultType="map" resultMap="boardList">
 	select
 				board_seq
@@ -244,6 +249,7 @@
 	where board_seq = #{seq}
 </select>
 
+<!-- 임시저장글 임시저장시 update -->
 <update id="button" parameterType="map">
 	update cp_board
 	set  board_subject = #{subject}
@@ -254,6 +260,7 @@
 	where board_seq = #{boardSeq}
 </update>
 
+<!-- 결재버튼 클릭시 update -->
 <update id="payButton" parameterType="map">
 	update cp_board
 	set  board_subject = #{subject}
@@ -290,6 +297,7 @@
 						 ,#{boardSeq}
 						 )
 </insert>
+
 
 <insert id="logInsert2" parameterType="map">
 	insert into cp_log (
@@ -470,13 +478,13 @@
 		    and board_regdate between #{date1} and #{date2}
 		    </when>
 	    </choose>
-		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> 
 		and board_writer = #{id}
 		</if>
-	 	<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+	 	<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> 
 		and board_writer = #{id}
 		</if>
-	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
+	 	<if test="level == 'manager' or memDrPay == 'manager'"> 
 	    and NOT(board_state = 'imsi' and board_writer != #{id})
 		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
@@ -484,7 +492,7 @@
 		</if>
 		
 		<choose>
-		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
+		<when test="level == 'gmanager' or memDrPay == 'gmanager'">
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
 	    and NOT(board_state = 'paywait' and board_writer != #{id})
@@ -553,10 +561,10 @@
 		    and board_regdate between #{date1} and #{date2}
 		    </when>
 	    </choose>
-		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> <!-- 사원 대리 -->
+		<if test="(memDrPay == null or memDrPay == 'null' or memDrPay == '') and (level == 'staff' or level == 'amanager')"> 
 		and board_writer = #{id}
 		</if>
-	 	<if test="level == 'manager' or memDrPay == 'manager'"> <!-- 과장 -->
+	 	<if test="level == 'manager' or memDrPay == 'manager'"> 
 	    and NOT(board_state = 'imsi' and board_writer != #{id})
 		and NOT(board_state = 'ban' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
 		and NOT(board_state = 'paing' and NOT (board_passer = #{id} or  board_passer in (select dp_gmem from cp_dp where dp_smem = #{id})))
@@ -564,7 +572,7 @@
 		</if>
 		
 		<choose>
-		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> <!-- 부장 -->
+		<when test="level == 'gmanager' or memDrPay == 'gmanager'"> 
 	    and NOT(board_state = 'imsi'
 				and board_writer != #{id})
 	    and NOT(board_state = 'paywait' and board_writer != #{id})

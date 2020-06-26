@@ -97,6 +97,9 @@ function cl(){
 				<input type="button" class="bt1" onclick="cl()" value="닫기" />
 			</td>
 		</tr>
+		
+		
+		
 	</table>
 </form>
 </body>
