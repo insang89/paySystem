@@ -27,7 +27,7 @@ body {
 <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
 <script>
 function goBack() {
-	window.history.back();
+	$("#frm").attr("method", "get").attr("action","list").submit(); /* 뒤로가기 버튼 */
 }
 
 $(function(){
@@ -202,6 +202,7 @@ $(function(){
 				<input type="hidden" id="memLevel" value="${session.memLevel}" />
 				<input type="hidden" id="memDrPay" name="memDrPay" value="${session.memDrPay}" />
 				<input type="hidden" id="memId" name="memId" value="${session.memId}" />
+				<input type="hidden" id="curPage" name="curPage" value="${curPage}" />
 			</td>
 		</tr>
 	</table>

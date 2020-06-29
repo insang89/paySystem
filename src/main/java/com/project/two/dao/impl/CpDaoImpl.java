@@ -188,5 +188,11 @@ public class CpDaoImpl implements CpDao{
 		// TODO Auto-generated method stub
 		return sqlSession.selectList("mapper.seqList", map);
 	}
+
+	@Override
+	public int viewCount(int seq) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("mapper.viewCount", seq);
+	}
 	
 }

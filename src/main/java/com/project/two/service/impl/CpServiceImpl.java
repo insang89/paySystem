@@ -218,5 +218,11 @@ public class CpServiceImpl implements CpService{
 		// TODO Auto-generated method stub
 		return cpDao.seqList(map);
 	}
+
+	@Override
+	public int viewCount(int seq) {
+		// TODO Auto-generated method stub
+		return cpDao.viewCount(seq);
+	}
 	
 }

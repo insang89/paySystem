@@ -125,7 +125,7 @@ public class CpController {
 		Map<String, Object> map2 = cpService.paging(curPage, totPage);
 		
 		map.put("Tcnt", totPage);
-		map.put("curPage", map2.get("curPage"));
+		map.put("curPage", map.get("curPage"));
 		map.put("totPage", map2.get("totPage"));
 		map.put("BLOCK_SCALE", map2.get("BLOCK_SCALE"));
 		map.put("curBlock", map2.get("curBlock"));
@@ -181,6 +181,11 @@ public class CpController {
 			return "redirect:list";
 		}
 		
+		//조회수 처리
+		int seq = Integer.parseInt(map.get("seq").toString());
+		int count = cpService.viewCount(seq);
+		System.out.println(count);
+		
 		Map<String, Object> sessionMap = (Map<String, Object>)session.getAttribute("sessionloginInfo"); // 세션에 담긴 정보를 맵에 담겠다.
 		model.addAttribute("session", sessionMap);
 		
@@ -189,6 +194,10 @@ public class CpController {
 		
 		List<Map<String, Object>> paypageList = cpService.paypageList(map); // 글의 로그를 List에 담음
 		model.addAttribute("paypageList", paypageList);		
+		
+		int curPage = Integer.parseInt(map.get("curPage").toString());
+		
+		model.addAttribute("curPage", curPage);
 		
 		return "cp/paypage";
 	}//paypage
@@ -428,6 +437,11 @@ public class CpController {
 	public String drrr(@RequestParam Map<String, Object> map) {
 		String kLevel2 = cpService.kLevel2(map); // ajax 선택된 사원의 직급 조회
 		return kLevel2;
+	}
+	
+	@RequestMapping("calendar")
+	public String calendar() {
+		return "Calendar";
 	}
 	
 }

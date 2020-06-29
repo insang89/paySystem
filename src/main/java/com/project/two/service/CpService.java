@@ -65,5 +65,7 @@ public interface CpService {
 	String setMemId(Map<String, Object> map);
 
 	List<Map<String, Object>> seqList(Map<String, Object> map);
+
+	int viewCount(int seq);
 	
 }

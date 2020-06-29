@@ -243,11 +243,12 @@ function popup(){
 				<th>결재일</th>
 				<th>결재자</th>
 				<th>결재상태</th>
+				<th>조회수</th>
 			</tr>
 			
 			<c:if test="${ck != 'true'}">
 			<c:forEach items="${writeList}" var="writeList">
-			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}'" id="tr" style="cursor: pointer;">
+			<tr onclick="location.href='paypage?seq=${writeList.boardSeq}&curPage=${pageMap.curPage}'" id="tr" style="cursor: pointer;">
 				<td align="center">${writeList.boardSeq}</td>
 				<td align="center">${writeList.boardWriterKR}</td>
 				<td align="center">${writeList.boardSubject}</td>
@@ -256,6 +257,7 @@ function popup(){
 				<td align="center">${writeList.boardUpdate}</td>
 				<td align="center">${writeList.boardPasserKR}</td>
 				<td align="center">${writeList.boardState}</td>
+				<td align="center">${writeList.viewCount}</td>
 			</tr>
 				
 			<input type="hidden" name="boardSeq" value="${writeList.boardSeq}" />
@@ -266,6 +268,7 @@ function popup(){
 			<input type="hidden" name="boardUpdate" value="${writeList.boardUpdate}" />
 			<input type="hidden" name="boardPasser" value="${writeList.boardPasser}" />
 			<input type="hidden" name="boardState" value="${writeList.boardState}" />
+			<input type="hidden" name="boardState" value="${writeList.viewCount}" />
 			</c:forEach>
 			</c:if>
 
@@ -276,7 +279,7 @@ function popup(){
 			</c:if>
 
 			<tr align="center">
-				<td colspan="8">
+				<td colspan="9">
 					 <c:if test="${pageMap.curBlock > 1}">
 		                    <!-- <a href="javascript:goPage('1')">[처음]</a> -->
 		                </c:if>
