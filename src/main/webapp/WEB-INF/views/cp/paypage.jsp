@@ -58,8 +58,6 @@ $(function(){
 		$("#frm").attr("method", "get").attr("action","banButton").submit();
 	});
 	
-	var boardState = $("#boardState").val(); // 글상태
-	
 	if(boardState == '결재대기'){
 		$("#chk2").prop("checked", false);
 		$("#chk3").prop("checked", false);

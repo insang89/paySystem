@@ -86,6 +86,11 @@ public class CpController {
 		}
 	}//login
 	
+	@RequestMapping("random")
+	public String random() {		
+		return "cp/random";
+	}
+	
 	//게시판 글목록 조회 + ajax + search
 	@RequestMapping("list")
 	public String list(@RequestParam Map<String, Object> map, Model model, HttpSession session) {
