@@ -111,9 +111,9 @@ $(function(){
 <!-- 		<th style="width: 150px;">팀4</th> -->
 <!-- 	</tr> -->
 <!-- </table> -->
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="멈춤" style="width: 100px; height: 80px;" onclick="Stop()" />
-<input type="button" id="btn" value="추첨" style="width: 100px; height: 80px;" />
-<input type="button" value="새로고침" style="width: 100px; height: 80px;" onclick="location.reload(true);" />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="STOP" style="width: 100px; height: 80px;" onclick="Stop()" />
+<input type="button" id="btn" value="START" style="width: 100px; height: 80px;" />
+<input type="button" value="RELOAD" style="width: 100px; height: 80px;" onclick="location.reload(true);" />
 <table border="1" id="table" style="text-align: center;">
 	<tr>
 		<th style="width: 150px;">팀1</th>
